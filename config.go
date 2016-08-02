@@ -37,9 +37,12 @@ type (
 
 // NewConfig comment pending
 func NewConfig(path string) *Config {
+	env := environment()
+
 	return &Config{
-		Path:       "./config",
-		KMSWrapper: aws.NewKMSWrapper(),
+		Env:        env,
+		Path:       fmt.Sprintf("%s/%s.json", path, env),
+		KMSWrapper: NewKMSWrapper(),
 	}
 }
 
@@ -76,21 +79,51 @@ func (c Config) EncryptedString(node string, key string) (string, error) {
 
 // Load comment pending
 func (c *Config) Load() error {
-	c.Env = c.environment()
+	log.Printf(fmt.Sprintf("Loading config from '%s'", c.Path))
 
-	filePath := fmt.Sprintf("%s/%s.json", c.Path, c.Env)
-	log.Printf(fmt.Sprintf("Loading config from '%s'", filePath))
-
-	config, err := ioutil.ReadFile(filePath)
+	config, err := ioutil.ReadFile(c.Path)
 	if err != nil {
 		return err
 	}
 
-	return json.Unmarshal([]byte(config), &c.data)
+	err := json.Unmarshal([]byte(config), &c.data)
+	if err != nil {
+		return err
+	}
+
+	err := c.Parse()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-// Parse comment pending
-func (c *Config) Parse() error {
+func (c Config) decryptSecureValue(key string, value string) (string, error) {
+	log.Printf("Encrypted config value found for '%s', decrypting", key)
+	decryptedValue, err := c.KMSWrapper.Decrypt(value)
+
+	if err != nil {
+		log.Printf("Failed to decrypt '%s'", key)
+		return "", err
+	}
+
+	return decryptedValue, nil
+}
+
+func (c Config) overrideEnv(sectionValue string, nodeValue string) (string, bool) {
+	environmentVariable := fmt.Sprintf(OverrideEnvStructure, sectionValue, nodeValue)
+	exists := os.Getenv(environmentVariable)
+
+	if exists != "" {
+		log.Printf("Override variable '%s' found", environmentVariable)
+		return exists, true
+	}
+
+	return "", false
+}
+
+func (c *Config) parse() error {
 	c.Sections = make(map[string]ConfigSection)
 
 	for sectionKey, sectionValue := range c.data {
@@ -142,30 +175,6 @@ func (c *Config) Parse() error {
 	return nil
 }
 
-func (c Config) overrideEnv(sectionValue string, nodeValue string) (string, bool) {
-	environmentVariable := fmt.Sprintf(OverrideEnvStructure, sectionValue, nodeValue)
-	exists := os.Getenv(environmentVariable)
-
-	if exists != "" {
-		log.Printf("Override variable '%s' found", environmentVariable)
-		return exists, true
-	}
-
-	return "", false
-}
-
-func (c Config) decryptSecureValue(key string, value string) (string, error) {
-	log.Printf("Encrypted config value found for '%s', decrypting", key)
-	decryptedValue, err := c.KMSWrapper.Decrypt(value)
-
-	if err != nil {
-		log.Printf("Failed to decrypt '%s'", key)
-		return "", err
-	}
-
-	return decryptedValue, nil
-}
-
 func (c Config) retrieve(node string, key string, encryptedValue bool) (interface{}, error) {
 	section, sectionExists := c.Sections[node]
 
@@ -177,17 +186,15 @@ func (c Config) retrieve(node string, key string, encryptedValue bool) (interfac
 				return node.EncryptedValue, nil
 			}
 			return node.Value, nil
-		} else {
-			return nil, fmt.Errorf("'value' key doesn't exist on node '%s' doesn't exist", key)
 		}
 
-		// return nil, fmt.Errorf("'%s' key doesn't exists", key) TODO: this return statement is unreachable
+		return nil, fmt.Errorf("'%s' key doesn't exists on node '%s'", key, node.Name)
 	}
 
 	return nil, fmt.Errorf("The config node '%s' doesn't exist", node)
 }
 
-func (c Config) environment() string {
+func environment() string {
 	environment := "development"
 
 	if os.Getenv("AWS_ENV") != "" {
