@@ -1,0 +1,11 @@
+machine:
+  services:
+    - docker
+
+dependencies:
+  override:
+    - echo "No dependencies."
+
+test:
+  override:
+    - echo "No tests."
