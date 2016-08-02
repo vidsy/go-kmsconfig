@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-const OverrideEnvStructure = "VIDSY_VAR_%s_%s"
+const overrideEnvStructure = "VIDSY_VAR_%s_%s"
 
 type (
 	// Config comment pending
@@ -17,7 +17,7 @@ type (
 		Sections   map[string]ConfigSection
 		Env        string
 		Path       string
-		KMSWrapper aws.KMSWrapper
+		KMSWrapper KMSWrapper
 	}
 
 	// ConfigSection comment pending
@@ -86,12 +86,12 @@ func (c *Config) Load() error {
 		return err
 	}
 
-	err := json.Unmarshal([]byte(config), &c.data)
+	err = json.Unmarshal([]byte(config), &c.data)
 	if err != nil {
 		return err
 	}
 
-	err := c.Parse()
+	err = c.parse()
 	if err != nil {
 		return err
 	}
@@ -112,7 +112,7 @@ func (c Config) decryptSecureValue(key string, value string) (string, error) {
 }
 
 func (c Config) overrideEnv(sectionValue string, nodeValue string) (string, bool) {
-	environmentVariable := fmt.Sprintf(OverrideEnvStructure, sectionValue, nodeValue)
+	environmentVariable := fmt.Sprintf(overrideEnvStructure, sectionValue, nodeValue)
 	exists := os.Getenv(environmentVariable)
 
 	if exists != "" {
