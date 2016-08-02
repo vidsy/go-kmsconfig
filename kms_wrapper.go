@@ -20,7 +20,7 @@ func NewKMSWrapper() KMSWrapper {
 }
 
 // Decrypt comment pending
-func (k KMSWrapper) Decrypt(ciphertextBlob string) (string, error) {
+func (k KMSWrapper) Decrypt(ciphertextBlob []byte) (string, error) {
 	output, err := k.Client.Decrypt(k.decryptParmas(ciphertextBlob))
 
 	if err != nil {
@@ -30,8 +30,8 @@ func (k KMSWrapper) Decrypt(ciphertextBlob string) (string, error) {
 	return string(output.Plaintext[:]), nil
 }
 
-func (k KMSWrapper) decryptParmas(ciphertextBlob string) *kms.DecryptInput {
+func (k KMSWrapper) decryptParmas(ciphertextBlob []byte) *kms.DecryptInput {
 	return &kms.DecryptInput{
-		CiphertextBlob: []byte(ciphertextBlob),
+		CiphertextBlob: ciphertextBlob,
 	}
 }
