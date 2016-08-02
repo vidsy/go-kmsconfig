@@ -7,5 +7,5 @@
 ## Usage
 
 ```
-glide get https://github.com/vidsy/kmsconfig
+glide get github.com/vidsy/kmsconfig
 ```
