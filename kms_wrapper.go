@@ -1,4 +1,4 @@
-package aws
+package kmsconfig
 
 import (
 	"github.com/aws/aws-sdk-go/aws/session"
