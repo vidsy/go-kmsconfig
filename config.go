@@ -1,7 +1,6 @@
 package kmsconfig
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -102,15 +101,7 @@ func (c *Config) Load() error {
 
 func (c Config) decryptSecureValue(key string, value string) (string, error) {
 	log.Printf("Encrypted config value found for '%s', decrypting", key)
-
-	decodedValue, err := base64.StdEncoding.DecodeString(value)
-
-	if err != nil {
-		log.Printf("Could not Base64 decode: '%s'", value)
-		return "", err
-	}
-
-	decryptedValue, err := c.KMSWrapper.Decrypt(decodedValue)
+	decryptedValue, err := c.KMSWrapper.Decrypt(value)
 
 	if err != nil {
 		log.Printf("Failed to decrypt '%s'", key)
