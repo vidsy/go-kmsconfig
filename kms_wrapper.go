@@ -1,8 +1,10 @@
 package kmsconfig
 
 import (
+	"encoding/base64"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/kms"
+	"log"
 )
 
 type (
@@ -20,8 +22,15 @@ func NewKMSWrapper() KMSWrapper {
 }
 
 // Decrypt comment pending
-func (k KMSWrapper) Decrypt(ciphertextBlob []byte) (string, error) {
-	output, err := k.Client.Decrypt(k.decryptParmas(ciphertextBlob))
+func (k KMSWrapper) Decrypt(encodedCipherTextBlob string) (string, error) {
+	decodedValue, err := base64.StdEncoding.DecodeString(encodedCipherTextBlob)
+
+	if err != nil {
+		log.Printf("Could not Base64 decode: '%s'", encodedCipherTextBlob)
+		return "", err
+	}
+
+	output, err := k.Client.Decrypt(k.decryptParmas(decodedValue))
 
 	if err != nil {
 		return "", err
@@ -30,8 +39,8 @@ func (k KMSWrapper) Decrypt(ciphertextBlob []byte) (string, error) {
 	return string(output.Plaintext[:]), nil
 }
 
-func (k KMSWrapper) decryptParmas(ciphertextBlob []byte) *kms.DecryptInput {
+func (k KMSWrapper) decryptParmas(cipherTextBlob []byte) *kms.DecryptInput {
 	return &kms.DecryptInput{
-		CiphertextBlob: ciphertextBlob,
+		CiphertextBlob: cipherTextBlob,
 	}
 }
