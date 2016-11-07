@@ -41,7 +41,7 @@ func NewConfig(path string) *Config {
 
 	return &Config{
 		Env:        env,
-		Path:       fmt.Sprintf("%s/%s.json", path, env),
+		Path:       path,
 		KMSWrapper: NewKMSWrapper(),
 	}
 }
@@ -79,9 +79,10 @@ func (c Config) EncryptedString(node string, key string) (string, error) {
 
 // Load comment pending
 func (c *Config) Load() error {
-	log.Printf(fmt.Sprintf("Loading config from '%s'", c.Path))
+	path := c.generatePath()
+	log.Printf(fmt.Sprintf("Loading config from '%s'", path))
 
-	config, err := ioutil.ReadFile(c.Path)
+	config, err := ioutil.ReadFile(path)
 	if err != nil {
 		return err
 	}
@@ -202,4 +203,8 @@ func environment() string {
 	}
 
 	return environment
+}
+
+func (c Config) generatePath() string {
+	return fmt.Sprintf("%s/%s.json", c.Path, c.Env)
 }
