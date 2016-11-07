@@ -4,12 +4,12 @@ general:
       - master
 
 machine:
-	services:
-		- docker
+  services:
+    - docker
 
 dependencies:
-	override:
-		- echo "No dependencies."
+  override:
+    - echo "No dependencies."
 
 test:
   override:
