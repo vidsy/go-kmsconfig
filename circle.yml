@@ -8,4 +8,5 @@ dependencies:
 
 test:
   override:
-    - echo "No tests."
+    - echo "Checking if value of VERSION file exists as Git tag..."
+    - make check-version
