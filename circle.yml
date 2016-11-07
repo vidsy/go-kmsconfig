@@ -1,3 +1,8 @@
+general:
+  branches:
+    ignore:
+      - master
+
 machine:
   services:
     - docker
@@ -8,4 +13,4 @@ dependencies:
 
 test:
   override:
-    - echo "No tests."
+    - make check-version
