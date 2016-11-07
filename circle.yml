@@ -1,7 +1,7 @@
 general:
-	branches:
-		ignore:
-			- master
+  branches:
+    ignore:
+      - master
 
 machine:
 	services:
