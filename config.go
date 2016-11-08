@@ -11,6 +11,12 @@ import (
 const overrideEnvStructure = "VIDSY_VAR_%s_%s"
 
 type (
+	ConfigInterrogator interface {
+		Integer(node string, key string) (int, error)
+		String(node string, key string) (string, error)
+		EncryptedString(node string, key string) (string, error)
+	}
+
 	// Config comment pending
 	Config struct {
 		data       map[string]map[string]map[string]interface{}
