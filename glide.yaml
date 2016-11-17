@@ -1,3 +1,4 @@
 package: github.com/vidsy/kmsconfig
-import:
+testImport:
 - package: github.com/aws/aws-sdk-go
+  version: ^1.5.3
