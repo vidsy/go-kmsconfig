@@ -153,6 +153,7 @@ func (c *Config) parse() error {
 
 				if envVarExists {
 					value = overrideEnvValue
+					encryptedValue = overrideEnvValue
 				} else {
 					if secure {
 						decryptedValue, err := c.decryptSecureValue(nodeKey, value.(string))
