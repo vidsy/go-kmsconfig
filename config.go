@@ -52,6 +52,16 @@ func NewConfig(path string) *Config {
 	}
 }
 
+// Boolean returns a boolean cast value from a config node and key.
+func (c Config) Boolean(node string, key string) (bool, error) {
+	configNode, err := c.retrieve(node, key, false)
+	if err != nil {
+		return false, err
+	}
+
+	return configNode.(bool), nil
+}
+
 // Integer comment pending
 func (c Config) Integer(node string, key string) (int, error) {
 	configNode, err := c.retrieve(node, key, false)
@@ -153,6 +163,7 @@ func (c *Config) parse() error {
 
 				if envVarExists {
 					value = overrideEnvValue
+					encryptedValue = overrideEnvValue
 				} else {
 					if secure {
 						decryptedValue, err := c.decryptSecureValue(nodeKey, value.(string))
