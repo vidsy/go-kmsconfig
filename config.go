@@ -11,10 +11,13 @@ import (
 const overrideEnvStructure = "VIDSY_VAR_%s_%s"
 
 type (
+	// ConfigInterrogator is an interface for mocking config.
 	ConfigInterrogator interface {
+		Boolean(node string, key string) (bool, error)
 		Integer(node string, key string) (int, error)
 		String(node string, key string) (string, error)
 		EncryptedString(node string, key string) (string, error)
+		Environment() string
 	}
 
 	// Config comment pending
@@ -60,6 +63,11 @@ func (c Config) Boolean(node string, key string) (bool, error) {
 	}
 
 	return configNode.(bool), nil
+}
+
+// Environment returns the value of the .Env field.
+func (c Config) Environment() string {
+	return c.Env
 }
 
 // Integer comment pending
