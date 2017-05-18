@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strconv"
 )
 
 const overrideEnvStructure = "VIDSY_VAR_%s_%s"
@@ -165,6 +166,7 @@ func (c *Config) parse() error {
 			encryptedValue := ""
 
 			_, isString := nodeValue["value"].(string)
+			_, isBool := nodeValue["value"].(bool)
 
 			if isString {
 				overrideEnvValue, envVarExists := c.overrideEnv(sectionKey, nodeKey)
@@ -181,6 +183,17 @@ func (c *Config) parse() error {
 
 						encryptedValue = value.(string)
 						value = decryptedValue
+					}
+				}
+			}
+
+			if isBool {
+				overrideEnvValue, envVarExists := c.overrideEnv(sectionKey, nodeKey)
+
+				if envVarExists {
+					boolValue, err := strconv.ParseBool(overrideEnvValue)
+					if err == nil {
+						value = boolValue
 					}
 				}
 			}
