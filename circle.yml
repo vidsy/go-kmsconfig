@@ -9,8 +9,9 @@ machine:
 
 dependencies:
   override:
-    - echo "No dependencies."
+    - make install-test-deps
 
 test:
   override:
     - make check-version
+    - make test-ci

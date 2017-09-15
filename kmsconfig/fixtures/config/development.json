@@ -1,0 +1,16 @@
+{
+  "app": {
+    "test_string": {
+      "value": "foo",
+      "secure": false
+    },
+    "test_int": {
+      "value": 1,
+      "secure": false
+    },
+    "test_bool": {
+      "value": true,
+      "secure": false
+    }
+  }
+}
