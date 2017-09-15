@@ -6,6 +6,9 @@ TEST_PACKAGES ?= "./kmsconfig ./test"
 
 VERSION = $(shell cat ./VERSION)
 
+add-binary-as-artifact:
+	cp -rp go-kmsconfig ${CIRCLE_ARTIFACTS}/go-kmsconfig
+
 check-version:
 	@echo "Checking if value of VERSION file exists as Git tag..."
 	git fetch
@@ -14,7 +17,7 @@ check-version:
 install-test-deps:
 	@docker run \
 	-v "${CURDIR}":${PATH_BASE}/${REPONAME} \
-	-e BUILD=false \
+	-e BUILD=true \
 	-w ${PATH_BASE}/${REPONAME} \
 	${GO_BUILDER_IMAGE}
 

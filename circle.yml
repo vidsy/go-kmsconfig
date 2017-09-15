@@ -15,3 +15,9 @@ test:
   override:
     - make check-version
     - make test-ci
+
+deployment:
+hub:
+  tag: /[0-9]+\.[0-9]+\.[0-9]+/
+  commands:
+    - make add-storybook-as-ci-artifact -e CIRCLE_ARTIFACTS=$CIRCLE_ARTIFACTS
