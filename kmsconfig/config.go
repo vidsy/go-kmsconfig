@@ -102,6 +102,16 @@ func (c Config) EncryptedString(node string, key string) (string, error) {
 	return configNode.(string), nil
 }
 
+// RawValue the raw value in the config.
+func (c Config) RawValue(node string, key string) (interface{}, error) {
+	configNode, err := c.retrieve(node, key, false)
+	if err != nil {
+		return nil, err
+	}
+
+	return configNode, nil
+}
+
 // Load comment pending
 func (c *Config) Load() error {
 	path := c.generatePath()

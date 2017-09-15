@@ -11,9 +11,8 @@ import (
 )
 
 var (
-	configPath     = flag.String("path", "./config", "The path to the config folder")
-	configNode     = flag.String("node", "", "The node key to load, in the format: 'top_level_node.child_level_node'")
-	configNodeType = flag.String("nodeType", "string", "the type of the node to load: 'string|int|bool")
+	configPath = flag.String("path", "./config", "The path to the config folder")
+	configNode = flag.String("node", "", "The node key to load, in the format: 'top_level_node.child_level_node'")
 )
 
 func main() {
@@ -31,7 +30,7 @@ func main() {
 		)
 	}
 
-	app, err := cli.NewApp(config, *configNode, *configNodeType)
+	app, err := cli.NewApp(config, *configNode)
 	if err != nil {
 		fatal(err)
 	}

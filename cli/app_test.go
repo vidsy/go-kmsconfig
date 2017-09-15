@@ -14,7 +14,6 @@ func TestApp(t *testing.T) {
 			_, err := cli.NewApp(
 				generateKMSConfig("foo", "baz"),
 				"foo.bar",
-				"string",
 			)
 			assert.NoError(t, err)
 		})
@@ -23,7 +22,6 @@ func TestApp(t *testing.T) {
 			_, err := cli.NewApp(
 				generateKMSConfig("foo", "baz"),
 				"foo_bar",
-				"string",
 			)
 
 			assert.Error(t, err)
@@ -31,50 +29,22 @@ func TestApp(t *testing.T) {
 	})
 
 	t.Run(".Value()", func(t *testing.T) {
-		t.Run("StringValue", func(t *testing.T) {
+		t.Run("ValidValue", func(t *testing.T) {
 			app, err := cli.NewApp(
-				generateKMSConfig("foo", "baz"),
+				generateKMSConfig("foo", "bar"),
 				"foo.bar",
-				"string",
 			)
 			assert.NoError(t, err)
 
 			value, err := app.Value()
 			assert.NoError(t, err)
-			assert.Equal(t, "baz", value)
-		})
-
-		t.Run("IntValue", func(t *testing.T) {
-			app, err := cli.NewApp(
-				generateKMSConfig("foo", float64(1)),
-				"foo.bar",
-				"int",
-			)
-			assert.NoError(t, err)
-
-			value, err := app.Value()
-			assert.NoError(t, err)
-			assert.Equal(t, 1, value)
-		})
-
-		t.Run("BoolValue", func(t *testing.T) {
-			app, err := cli.NewApp(
-				generateKMSConfig("foo", true),
-				"foo.bar",
-				"bool",
-			)
-			assert.NoError(t, err)
-
-			value, err := app.Value()
-			assert.NoError(t, err)
-			assert.Equal(t, true, value)
+			assert.Equal(t, "bar", value)
 		})
 
 		t.Run("ErrorWhenKeyDoesntExist", func(t *testing.T) {
 			app, err := cli.NewApp(
 				generateKMSConfig("foo", "baz"),
 				"foo.baz",
-				"string",
 			)
 			assert.NoError(t, err)
 
