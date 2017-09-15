@@ -9,7 +9,7 @@ machine:
 
 dependencies:
   override:
-    - echo "No dependencies."
+    - make install-test-deps
 
 test:
   override:

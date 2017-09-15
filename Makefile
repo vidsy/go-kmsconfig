@@ -11,6 +11,13 @@ check-version:
 	git fetch
 	(! git rev-list ${VERSION})
 
+install-test-deps:
+	@docker run \
+	-v "${CURDIR}":${PATH_BASE}/${REPONAME} \
+	-e BUILD=false \
+	-w ${PATH_BASE}/${REPONAME} \
+	${GO_BUILDER_IMAGE}
+
 push-tag:
 	git checkout ${BRANCH}
 	git pull origin ${BRANCH}
