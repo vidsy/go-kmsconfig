@@ -15,7 +15,7 @@
 -- live.json
 ```
 
-An exmaple of a config file looks like:
+An example of a config file looks like:
 
 ```json
 
