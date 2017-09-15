@@ -20,4 +20,4 @@ deployment:
   hub:
     tag: /[0-9]+\.[0-9]+\.[0-9]+/
     commands:
-      - make add-storybook-as-ci-artifact -e CIRCLE_ARTIFACTS=$CIRCLE_ARTIFACTS
+      - make add-binary-as-artifact -e CIRCLE_ARTIFACTS=$CIRCLE_ARTIFACTS
