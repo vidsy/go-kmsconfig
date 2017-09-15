@@ -105,8 +105,6 @@ func (c Config) EncryptedString(node string, key string) (string, error) {
 // Load comment pending
 func (c *Config) Load() error {
 	path := c.generatePath()
-	log.Printf(fmt.Sprintf("Loading config from '%s'", path))
-
 	config, err := ioutil.ReadFile(path)
 	if err != nil {
 		return err
