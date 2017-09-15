@@ -2,7 +2,7 @@ BRANCH = "master"
 GO_BUILDER_IMAGE ?= "vidsyhq/go-builder"
 PATH_BASE ?= "/go/src/github.com/vidsy"
 REPONAME ?= "go-kmsconfig"
-TEST_PACKAGES ?= "./kmsconfig ./test"
+TEST_PACKAGES ?= "./kmsconfig ./cli"
 
 VERSION = $(shell cat ./VERSION)
 
