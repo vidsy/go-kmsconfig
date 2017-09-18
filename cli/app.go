@@ -12,8 +12,8 @@ type (
 	// value.
 	App struct {
 		config      *kmsconfig.Config
-		NodeSection string
 		NodeChild   string
+		NodeSection string
 	}
 )
 
@@ -30,8 +30,8 @@ func NewApp(config *kmsconfig.Config, nodeName string) (*App, error) {
 
 	return &App{
 		config:      config,
-		NodeSection: nodeParts[0],
 		NodeChild:   nodeParts[1],
+		NodeSection: nodeParts[0],
 	}, nil
 }
 

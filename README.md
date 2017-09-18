@@ -102,7 +102,7 @@ https://s3-eu-west-1.amazonaws.com/go-kmsconfig.live.vidsy.co/${VERSION}/go-kmsc
 #### Usage
 
 ```bash
-./go-kmsconfig --help 
+$: ./go-kmsconfig --help 
 ```
 
 #### Example
