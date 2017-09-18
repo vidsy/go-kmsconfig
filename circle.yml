@@ -9,9 +9,15 @@ machine:
 
 dependencies:
   override:
-    - make install-test-deps
+    - make install-deps-and-build-binary
 
 test:
   override:
     - make check-version
     - make test-ci
+
+deployment:
+  hub:
+    tag: /[0-9]+\.[0-9]+\.[0-9]+/
+    commands:
+      - make deploy
