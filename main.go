@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log"
 	"os"
 
 	"flag"
@@ -21,30 +22,25 @@ func main() {
 	config := kmsconfig.NewConfig(*configPath)
 	err := config.Load()
 	if err != nil {
-		fatal(err)
+		log.Fatal(err)
 	}
 
 	if configNode == nil {
-		fatal(
+		log.Fatal(
 			errors.New("Please set -node parameter"),
 		)
 	}
 
 	app, err := cli.NewApp(config, *configNode)
 	if err != nil {
-		fatal(err)
+		log.Fatal(err)
 	}
 
 	value, err := app.Value()
 	if err != nil {
-		fatal(err)
+		log.Fatal(err)
 	}
 
 	fmt.Println(value)
 	os.Exit(0)
-}
-
-func fatal(err error) {
-	fmt.Println(err)
-	os.Exit(-1)
 }
