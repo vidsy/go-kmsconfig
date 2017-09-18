@@ -83,3 +83,31 @@ func main() {
   log.Println("Config value for 'development.json' is: %s", configValue)
 }
 ```
+
+### Binary
+
+For each tag a binary is also built that allows usage of the go-kmsconfg library from
+a simple binary.
+
+#### Setup
+
+The binary can be found at:
+
+```
+https://s3-eu-west-1.amazonaws.com/go-kmsconfig.live.vidsy.co/${VERSION}/go-kmsconfig
+```
+
+> Where version is the tag you want the binary for.
+
+#### Usage
+
+```bash
+./go-kmsconfig --help 
+```
+
+#### Example
+
+```bash
+$: ./go-kmsconfig -path /path/to/config -node app.some_config_value
+$: 23
+```
