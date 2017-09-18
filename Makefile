@@ -16,7 +16,7 @@ deploy:
 	@echo "Deploying version ${VERSION} to S3"
 	aws s3 cp go-kmsconfig s3://${S3_BUCKET}/${VERSION}/go-kmsconfig
 
-install-test-deps:
+install-deps-and-build-binary:
 	@docker run \
 	-v "${CURDIR}":${PATH_BASE}/${REPONAME} \
 	-e BUILD=true \
