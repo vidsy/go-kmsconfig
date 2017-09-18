@@ -3,16 +3,18 @@ GO_BUILDER_IMAGE ?= "vidsyhq/go-builder"
 PATH_BASE ?= "/go/src/github.com/vidsy"
 REPONAME ?= "go-kmsconfig"
 TEST_PACKAGES ?= "./kmsconfig ./cli"
+S3_BUCKET ?= "go-kmsconfig.live.vidsy.co"
 
 VERSION = $(shell cat ./VERSION)
-
-add-binary-as-artifact:
-	cp -rp go-kmsconfig ${CIRCLE_ARTIFACTS}/go-kmsconfig
 
 check-version:
 	@echo "Checking if value of VERSION file exists as Git tag..."
 	git fetch
 	(! git rev-list ${VERSION})
+
+deploy:
+	@echo "Deploying version ${VERSION} to S3"
+	aws s3 cp go-kmsconfig s3://${S3_BUCKET}/${VERSION}/go-kmsconfig
 
 install-test-deps:
 	@docker run \
