@@ -29,6 +29,35 @@ func TestConfig(t *testing.T) {
 		assert.Equal(t, true, boolValue)
 	})
 
+	t.Run("StringMap", func(t *testing.T) {
+		config := kmsconfig.NewConfig(configLocation)
+		err := config.Load()
+		assert.NoError(t, err)
+
+		t.Run("ReturnsCorrectStringMap", func(t *testing.T) {
+			stringMap, err := config.StringMap("app", "test_string_map")
+			assert.NoError(t, err)
+
+			test := map[string]map[string]string{
+				"foo": map[string]string{
+					"bar": "baz",
+				},
+			}
+
+			assert.Equal(t, test, stringMap)
+		})
+
+		t.Run("ReturnsErrorIfNotMap", func(t *testing.T) {
+			_, err := config.StringSlice("app", "test_string")
+			assert.Error(t, err)
+		})
+
+		t.Run("ReturnsErrorIfKeyNotString", func(t *testing.T) {
+			_, err := config.StringSlice("app", "test_string_map_wrong_type")
+			assert.Error(t, err)
+		})
+	})
+
 	t.Run(".StringSlice", func(t *testing.T) {
 		config := kmsconfig.NewConfig(configLocation)
 		err := config.Load()

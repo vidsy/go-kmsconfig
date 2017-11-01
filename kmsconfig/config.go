@@ -93,6 +93,63 @@ func (c Config) String(node string, key string) (string, error) {
 	return configNode.(string), nil
 }
 
+// StringMap returns a map of string key values.
+func (c Config) StringMap(node string, key string) (map[string]map[string]string, error) {
+	configNode, err := c.retrieve(node, key, false)
+	if err != nil {
+		return nil, err
+	}
+
+	values := make(map[string]map[string]string)
+
+	switch reflect.TypeOf(configNode).Kind() {
+	case reflect.Map:
+		configNodeReflectedValue := reflect.ValueOf(configNode)
+		mapKeys := configNodeReflectedValue.MapKeys()
+
+		for _, mapKey := range mapKeys {
+			mapValue := configNodeReflectedValue.MapIndex(mapKey).Elem()
+			switch mapValue.Kind() {
+			case reflect.Map:
+				innerMapKeys := mapValue.MapKeys()
+				for _, innerMapKey := range innerMapKeys {
+					if innerMapKey.Kind() != reflect.String {
+						return nil, fmt.Errorf(
+							"Expected map[string]map[string] key to be String, got: '%s'",
+							innerMapKey.Kind(),
+						)
+					}
+
+					innerMapValue := mapValue.MapIndex(innerMapKey).Elem()
+					if innerMapValue.Kind() != reflect.String {
+						return nil, fmt.Errorf(
+							"Expected map[string]map[string]string value to be String, got: '%s'",
+							innerMapValue.Kind(),
+						)
+					}
+					if _, ok := values[mapKey.String()]; !ok {
+						values[mapKey.String()] = make(map[string]string)
+					}
+
+					values[mapKey.String()][innerMapKey.String()] = innerMapValue.String()
+				}
+			default:
+				return nil, fmt.Errorf(
+					"Expected map[string] to be Map, got: '%s'",
+					mapValue.Kind(),
+				)
+			}
+		}
+	default:
+		return nil, fmt.Errorf(
+			"Expected node type to be Map, got: '%s'",
+			reflect.TypeOf(configNode).Kind(),
+		)
+	}
+
+	return values, nil
+}
+
 // StringSlice returns a slice of strings.
 func (c Config) StringSlice(node string, key string) ([]string, error) {
 	configNode, err := c.retrieve(node, key, false)
