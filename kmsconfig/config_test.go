@@ -14,7 +14,6 @@ func TestConfig(t *testing.T) {
 	t.Run("LoadsConfigForDefaultEnvironment", func(t *testing.T) {
 		config := kmsconfig.NewConfig(configLocation)
 		err := config.Load()
-
 		assert.NoError(t, err)
 
 		stringValue, err := config.String("app", "test_string")
@@ -28,6 +27,28 @@ func TestConfig(t *testing.T) {
 		boolValue, err := config.Boolean("app", "test_bool")
 		assert.NoError(t, err)
 		assert.Equal(t, true, boolValue)
+	})
+
+	t.Run(".StringSlice", func(t *testing.T) {
+		config := kmsconfig.NewConfig(configLocation)
+		err := config.Load()
+		assert.NoError(t, err)
+
+		t.Run("ReturnsCorrectSlice", func(t *testing.T) {
+			stringSlice, err := config.StringSlice("app", "test_string_slice")
+			assert.NoError(t, err)
+			assert.Equal(t, []string{"foo", "bar"}, stringSlice)
+		})
+
+		t.Run("ReturnsErrorIfNotSlice", func(t *testing.T) {
+			_, err := config.StringSlice("app", "test_string")
+			assert.Error(t, err)
+		})
+
+		t.Run("ReturnsErrorIfMixedValues", func(t *testing.T) {
+			_, err := config.StringSlice("app", "test_string_slice_mixed_values")
+			assert.Error(t, err)
+		})
 	})
 
 	t.Run("LoadsConfigFromEnvironmentOverride", func(t *testing.T) {
