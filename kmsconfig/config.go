@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"reflect"
 	"strconv"
 )
 
@@ -90,6 +91,41 @@ func (c Config) String(node string, key string) (string, error) {
 	}
 
 	return configNode.(string), nil
+}
+
+// StringSlice returns a slice of strings.
+func (c Config) StringSlice(node string, key string) ([]string, error) {
+	configNode, err := c.retrieve(node, key, false)
+	if err != nil {
+		return nil, err
+	}
+
+	var values []string
+	switch reflect.TypeOf(configNode).Kind() {
+	case reflect.Slice:
+		configNodeReflectedValue := reflect.ValueOf(configNode)
+		for i := 0; i < configNodeReflectedValue.Len(); i++ {
+			item := configNodeReflectedValue.Index(i).Elem()
+			if item.Kind() != reflect.String {
+				return nil, fmt.Errorf(
+					"Mixed types in slice, expected all strings but got: %s",
+					item.Kind(),
+				)
+			}
+
+			values = append(
+				values,
+				item.String(),
+			)
+		}
+	default:
+		return nil, fmt.Errorf(
+			"Expected underlying type to be a Slice, got: %s",
+			reflect.TypeOf(configNode).Kind(),
+		)
+	}
+
+	return values, nil
 }
 
 // EncryptedString comment pending

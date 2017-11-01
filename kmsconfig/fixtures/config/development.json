@@ -4,6 +4,20 @@
       "value": "foo",
       "secure": false
     },
+    "test_string_slice": {
+      "value": [
+        "foo",
+        "bar"
+      ],
+      "secure": false
+    },
+    "test_string_slice_mixed_values": {
+      "value": [
+        "foo",
+        1
+      ],
+      "secure": false
+    },
     "test_int": {
       "value": 1,
       "secure": false
