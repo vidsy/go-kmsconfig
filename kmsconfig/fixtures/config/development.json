@@ -18,6 +18,29 @@
       ],
       "secure": false
     },
+    "test_string_map": {
+      "value": {
+        "foo": {
+          "bar": "baz"
+        }
+      },
+      "secure": false
+    },
+    "test_string_map_wrong_type": {
+      "value": {
+        "foo": "bop"
+      },
+      "secure": false
+    },
+    "test_string_map_wrong_type": {
+      "value": {
+        "foo": {
+          "bar": 1
+        }
+      },
+      "secure": false
+    },
+
     "test_int": {
       "value": 1,
       "secure": false
