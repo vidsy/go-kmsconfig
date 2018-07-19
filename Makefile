@@ -1,11 +1,8 @@
 BRANCH = "master"
-GO_BUILDER_IMAGE ?= "vidsyhq/go-builder"
 PACKAGES ?= "$(shell glide nv)"
-PATH_BASE ?= "/go/src/github.com/vidsy"
 PWD = $(shell pwd)
 REPONAME ?= "go-kmsconfig"
 S3_BUCKET ?= "go-kmsconfig.live.vidsy.co"
-TEST_PACKAGES ?= "./kmsconfig ./cli"
 VERSION = $(shell cat ./VERSION)
 
 build-image:
