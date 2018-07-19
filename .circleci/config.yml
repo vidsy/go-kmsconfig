@@ -25,7 +25,7 @@ jobs:
       - setup_remote_docker
       - *install_docker_client
       - run:  make build-image
-    working_directory: /go/src/github.com/vidsy/cli
+    working_directory: /go/src/github.com/vidsy/go-kmsconfig
 
   check_for_clubhouse_ticket_comment:
     docker:
@@ -42,7 +42,7 @@ jobs:
     steps:
       - checkout
       - run: make check-version
-    working_directory: /go/src/github.com/vidsy/cli
+    working_directory: /go/src/github.com/vidsy/go-kmsconfig
 
   deploy:
     docker:
@@ -56,7 +56,7 @@ jobs:
       - deploy:
           name: deploy
           command: make push-to-registry
-    working_directory: /go/src/github.com/vidsy/cli
+    working_directory: /go/src/github.com/vidsy/go-kmsconfig
 
   install_and_build:
     docker:
@@ -69,8 +69,8 @@ jobs:
           key: dependency-cache-{{ .Revision }}
           paths:
             - vendor
-            - cli
-    working_directory: /go/src/github.com/vidsy/cli
+            - go-kmsconfig
+    working_directory: /go/src/github.com/vidsy/go-kmsconfig
 
   release:
     docker:
@@ -80,7 +80,7 @@ jobs:
       - run: apk update && apk add ca-certificates make
       - *restore_cache
       - run: make release -e VIDSY_GOBOT_GITHUB_TOKEN=${VIDSY_GOBOT_GITHUB_TOKEN}
-    working_directory: /go/src/github.com/vidsy/cli
+    working_directory: /go/src/github.com/vidsy/go-kmsconfig
 
   test:
     docker:
@@ -89,7 +89,7 @@ jobs:
       - checkout
       - *restore_cache
       - run: make test
-    working_directory: /go/src/github.com/vidsy/cli
+    working_directory: /go/src/github.com/vidsy/go-kmsconfig
 
   vet:
     docker:
@@ -98,7 +98,7 @@ jobs:
       - checkout
       - *restore_cache
       - run: make vet
-    working_directory: /go/src/github.com/vidsy/cli
+    working_directory: /go/src/github.com/vidsy/go-kmsconfig
 
 workflows:
   version: 2
