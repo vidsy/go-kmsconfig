@@ -13,7 +13,6 @@ restore_cache: &restore_cache
     keys:
       - dependency-cache-{{ .Revision }} 
 
-
 version: 2
 jobs:
   build_image:
