@@ -2,6 +2,7 @@ BRANCH = "master"
 GO_BUILDER_IMAGE ?= "vidsyhq/go-builder"
 PACKAGES ?= "$(shell glide nv)"
 PATH_BASE ?= "/go/src/github.com/vidsy"
+PWD = $(shell pwd)
 REPONAME ?= "go-kmsconfig"
 S3_BUCKET ?= "go-kmsconfig.live.vidsy.co"
 TEST_PACKAGES ?= "./kmsconfig ./cli"
@@ -21,6 +22,9 @@ deploy:
 install:
 	@echo "=> Installing dependencies"
 	@dep ensure
+
+lint-ci:
+	@docker run -i --rm -v /var/run/docker.sock:/var/run/docker.sock -v ${PWD}:${PWD} -v ~/.circleci/:/root/.circleci --workdir ${PWD} circleci/picard:latest circleci config -c .circleci/config.yml validate
 
 push-tag:
 	git checkout ${BRANCH}
