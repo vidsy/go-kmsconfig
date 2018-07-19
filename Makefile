@@ -8,6 +8,19 @@ VERSION = $(shell cat ./VERSION)
 build-image:
 	@docker build -t vidsyhq/${REPONAME} .
 
+bump:
+	@if test -z $(v); \
+		then echo "Bumping patch version"; echo $(shell echo `cut -d\. -f1 ./VERSION`.`cut -d\. -f2 ./VERSION`.$$((`cut -d\. -f3 ./VERSION`+1))) > ./VERSION; \
+	elif [ "$(v)" = "minor" ]; \
+		then echo "Bumping minor version"; echo $(shell echo `cut -d\. -f1 ./VERSION`.$$((`cut -d\. -f2 ./VERSION`+1)).`cut -d\. -f3 ./VERSION`) > ./VERSION; \
+	elif [ "$(v)" = "major" ]; \
+		then echo "Bumping major version"; echo $(shell echo $$((`cut -d\. -f1 ./VERSION`+1)).`cut -d\. -f2 ./VERSION`.`cut -d\. -f3 ./VERSION`) > ./VERSION; \
+	else \
+		echo "Unrecognised version bump option specified: $(v)"; exit 1;\
+	fi
+	@git add VERSION
+	@git commit -m "Bump version"
+
 check-version:
 	@echo "Checking if value of VERSION file exists as Git tag..."
 	(! git rev-list ${VERSION})
