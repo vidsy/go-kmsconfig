@@ -35,6 +35,10 @@ push-to-registry:
 	@docker push vidsyhq/${REPONAME}:${CIRCLE_TAG}
 	@docker push vidsyhq/${REPONAME}
 
+release:
+	rm -rf dist
+	@GITHUB_TOKEN=${VIDSY_GOBOT_GITHUB_TOKEN} VERSION=${VERSION} BUILD_TIME=%${BUILD_TIME} goreleaser
+
 run:
 	@if test -z $(path); then echo "Please specify a config file path"; exit 1; fi
 	@if test -z $(node); then echo "Please specify a config node"; exit 1; fi
