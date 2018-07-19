@@ -34,6 +34,11 @@ push-to-registry:
 	@docker push vidsyhq/${REPONAME}:${CIRCLE_TAG}
 	@docker push vidsyhq/${REPONAME}
 
+run:
+	@if test -z $(path); then echo "Please specify a config file path"; exit 1; fi
+	@if test -z $(node); then echo "Please specify a config node"; exit 1; fi
+	@docker run --rm -v $(path):/config -e AWS_ENV=${AWS_ENV} vidsyhq/${REPONAME}:latest -path /config -node $(node)
+
 test:
 	@go test "${PACKAGES}" -cover
 
