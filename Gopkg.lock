@@ -2,6 +2,7 @@
 
 
 [[projects]]
+  digest = "1:f10a4efc34fb3dfa6f92b17d89392d114e9137cccd26e281e6fc3bf80a7f96cd"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -31,43 +32,58 @@
     "private/protocol/rest",
     "private/protocol/xml/xmlutil",
     "service/kms",
-    "service/sts"
+    "service/sts",
   ]
+  pruneopts = "T"
   revision = "6a2f953ac4f08681e684e199039f0d6672d5deea"
   version = "v1.13.48"
 
 [[projects]]
+  digest = "1:52f195ad0e20a92d8604c1ba3cd246c61644c03eaa454b5acd41be89841e0d10"
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
+  pruneopts = "T"
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
   version = "v1.1.0"
 
 [[projects]]
+  digest = "1:f810552aea0e09c97de1ec5675088c6ed7b5afbf154b0cb4a2ae92c1ca1b6cc7"
   name = "github.com/go-ini/ini"
   packages = ["."]
+  pruneopts = "T"
   revision = "6529cf7c58879c08d927016dde4477f18a0634cb"
   version = "v1.36.0"
 
 [[projects]]
+  digest = "1:eebce3c1fad57b604c517ea649edd5dcbd2530f0f7e62ac0b7b232f2eacbcc88"
   name = "github.com/jmespath/go-jmespath"
   packages = ["."]
+  pruneopts = "T"
   revision = "0b12d6b5"
 
 [[projects]]
+  digest = "1:22aa691fe0213cb5c07d103f9effebcb7ad04bee45a0ce5fe5369d0ca2ec3a1f"
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
+  pruneopts = "T"
   revision = "792786c7400a136282c1664665ae0a8db921c6c2"
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:2a3eb3dd47e1f22625488dce56ff3da2813abe6e91ab2caf02a8a1b2ec118b30"
   name = "github.com/stretchr/testify"
   packages = ["assert"]
+  pruneopts = "T"
   revision = "69483b4bd14f5845b5a1e55bca19e954e827f1d0"
   version = "v1.1.4"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ced31343fda5b32150b86ecc628053745728719efbd37d7b9cded619407a27c4"
+  input-imports = [
+    "github.com/aws/aws-sdk-go/aws/session",
+    "github.com/aws/aws-sdk-go/service/kms",
+    "github.com/stretchr/testify/assert",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
