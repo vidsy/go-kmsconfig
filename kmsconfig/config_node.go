@@ -1,7 +1,8 @@
 package kmsconfig
 
 type (
-	// ConfigNode comment pending
+	// ConfigNode a node in the config, a child of a
+	// ConfigSection.
 	ConfigNode struct {
 		Name           string
 		Value          interface{}

@@ -12,7 +12,8 @@ import (
 const overrideEnvStructure = "VIDSY_VAR_%s_%s"
 
 type (
-	// Config comment pending
+	// Config stores all the config data, KMS wrapper and
+	// environment settings.
 	Config struct {
 		data       map[string]map[string]map[string]interface{}
 		logHandler LogHandler
