@@ -19,7 +19,11 @@ var (
 func main() {
 	flag.Parse()
 
-	config := kmsconfig.NewConfig(*configPath)
+	logHandler := func(message string) {
+		log.Println(message)
+	}
+
+	config := kmsconfig.NewConfig(*configPath, logHandler)
 	err := config.Load()
 	if err != nil {
 		log.Fatal(err)

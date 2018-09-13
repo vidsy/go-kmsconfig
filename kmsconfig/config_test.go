@@ -10,9 +10,10 @@ import (
 
 func TestConfig(t *testing.T) {
 	configLocation := "./fixtures/config"
+	logHandler := func(message string) {}
 
 	t.Run("LoadsConfigForDefaultEnvironment", func(t *testing.T) {
-		config := kmsconfig.NewConfig(configLocation)
+		config := kmsconfig.NewConfig(configLocation, logHandler)
 		err := config.Load()
 		assert.NoError(t, err)
 
@@ -30,7 +31,7 @@ func TestConfig(t *testing.T) {
 	})
 
 	t.Run(".StringSlice", func(t *testing.T) {
-		config := kmsconfig.NewConfig(configLocation)
+		config := kmsconfig.NewConfig(configLocation, logHandler)
 		err := config.Load()
 		assert.NoError(t, err)
 
@@ -55,7 +56,7 @@ func TestConfig(t *testing.T) {
 		err := os.Setenv("AWS_ENV", "test")
 		assert.NoError(t, err)
 
-		config := kmsconfig.NewConfig(configLocation)
+		config := kmsconfig.NewConfig(configLocation, logHandler)
 		err = config.Load()
 		assert.NoError(t, err)
 
@@ -68,14 +69,14 @@ func TestConfig(t *testing.T) {
 		err := os.Setenv("AWS_ENV", "foo")
 		assert.NoError(t, err)
 
-		config := kmsconfig.NewConfig(configLocation)
+		config := kmsconfig.NewConfig(configLocation, logHandler)
 		err = config.Load()
 		os.Unsetenv("AWS_ENV")
 		assert.Error(t, err)
 	})
 
 	t.Run("NodeErrors", func(t *testing.T) {
-		config := kmsconfig.NewConfig(configLocation)
+		config := kmsconfig.NewConfig(configLocation, logHandler)
 		err := config.Load()
 		assert.NoError(t, err)
 
@@ -94,7 +95,7 @@ func TestConfig(t *testing.T) {
 		err := os.Setenv("VIDSY_VAR_app_test_string", "baz")
 		assert.NoError(t, err)
 
-		config := kmsconfig.NewConfig(configLocation)
+		config := kmsconfig.NewConfig(configLocation, logHandler)
 		err = config.Load()
 		os.Unsetenv("VIDSY_VAR_app_string_value")
 

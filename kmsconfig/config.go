@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"reflect"
 	"strconv"
@@ -13,47 +12,27 @@ import (
 const overrideEnvStructure = "VIDSY_VAR_%s_%s"
 
 type (
-	// ConfigInterrogator is an interface for mocking config.
-	ConfigInterrogator interface {
-		Boolean(node string, key string) (bool, error)
-		Integer(node string, key string) (int, error)
-		String(node string, key string) (string, error)
-		EncryptedString(node string, key string) (string, error)
-		Environment() string
-	}
-
-	// Config comment pending
+	// Config stores all the config data, KMS wrapper and
+	// environment settings.
 	Config struct {
 		data       map[string]map[string]map[string]interface{}
-		Sections   map[string]ConfigSection
+		logHandler LogHandler
 		Env        string
-		Path       string
 		KMSWrapper KMSWrapper
-	}
-
-	// ConfigSection comment pending
-	ConfigSection struct {
-		Name  string
-		Nodes map[string]ConfigNode
-	}
-
-	// ConfigNode comment pending
-	ConfigNode struct {
-		Name           string
-		Value          interface{}
-		EncryptedValue string
-		Secure         bool
+		Path       string
+		Sections   map[string]ConfigSection
 	}
 )
 
 // NewConfig comment pending
-func NewConfig(path string) *Config {
+func NewConfig(path string, logHandler LogHandler) *Config {
 	env := environment()
 
 	return &Config{
 		Env:        env,
-		Path:       path,
 		KMSWrapper: NewKMSWrapper(),
+		logHandler: logHandler,
+		Path:       path,
 	}
 }
 
@@ -170,11 +149,13 @@ func (c *Config) Load() error {
 }
 
 func (c Config) decryptSecureValue(key string, value string) (string, error) {
-	log.Printf("Encrypted config value found for '%s', decrypting", key)
+	c.logHandler(
+		fmt.Sprintf("Encrypted config value found for '%s', decrypting", key),
+	)
+
 	decryptedValue, err := c.KMSWrapper.Decrypt(value)
 
 	if err != nil {
-		log.Printf("Failed to decrypt '%s'", key)
 		return "", err
 	}
 
@@ -186,7 +167,9 @@ func (c Config) overrideEnv(sectionValue string, nodeValue string) (string, bool
 	exists := os.Getenv(environmentVariable)
 
 	if exists != "" {
-		log.Printf("Override variable '%s' found", environmentVariable)
+		c.logHandler(
+			fmt.Sprintf("Override variable '%s' found", environmentVariable),
+		)
 		return exists, true
 	}
 
