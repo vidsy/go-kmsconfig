@@ -8,19 +8,6 @@ import (
 	"github.com/vidsy/go-kmsconfig/kmsconfig"
 )
 
-type (
-	configExample struct {
-		App app `config:"app"`
-	}
-
-	app struct {
-		TestBool        bool     `config:"test_bool"`
-		TestString      string   `config:"test_string"`
-		TestStringSlice []string `config:"test_string_slice"`
-		TestInt         int64    `config:"test_int"`
-	}
-)
-
 func TestConfig(t *testing.T) {
 	configLocation := "./fixtures/config"
 	logHandler := func(message string) {}
@@ -118,12 +105,20 @@ func TestConfig(t *testing.T) {
 	})
 
 	t.Run(".Populate()", func(t *testing.T) {
-		t.Run("PopulatesStructCorrectly", func(t *testing.T) {
-			config := kmsconfig.NewConfig(configLocation, logHandler)
-			err := config.Load()
-			assert.NoError(t, err)
+		config := kmsconfig.NewConfig(configLocation, logHandler)
+		err := config.Load()
+		assert.NoError(t, err)
 
-			var configStruct configExample
+		t.Run("PopulatesStructCorrectly", func(t *testing.T) {
+			var configStruct struct {
+				App struct {
+					TestBool        bool     `config:"test_bool"`
+					TestString      string   `config:"test_string"`
+					TestStringSlice []string `config:"test_string_slice"`
+					TestInt         int64    `config:"test_int"`
+				} `config:"app"`
+			}
+
 			err = config.Populate(&configStruct)
 			assert.NoError(t, err)
 
@@ -134,26 +129,37 @@ func TestConfig(t *testing.T) {
 		})
 
 		t.Run("ReturnsErrorWithEmptyStruct", func(t *testing.T) {
-			config := kmsconfig.NewConfig(configLocation, logHandler)
-			err := config.Load()
-			assert.NoError(t, err)
-
 			var configStruct struct{}
 			err = config.Populate(&configStruct)
 			assert.Error(t, err)
 		})
 
 		t.Run("ReturnsErrorWithNestedStructFiledWithNoValues", func(t *testing.T) {
-			config := kmsconfig.NewConfig(configLocation, logHandler)
-			err := config.Load()
-			assert.NoError(t, err)
-
 			var configStruct struct {
 				Foo struct{}
 			}
 			err = config.Populate(&configStruct)
 			assert.Error(t, err)
+		})
 
+		t.Run("ReturnsErrorWithMissingNode", func(t *testing.T) {
+			var configStruct struct {
+				App struct {
+					MissingField string `config:"missing_field"`
+				} `config:"app"`
+			}
+			err = config.Populate(&configStruct)
+			assert.Error(t, err)
+		})
+
+		t.Run("ReturnsErrorIfStructFieldTypeDifferentToTypeInJSONFile", func(t *testing.T) {
+			var configStruct struct {
+				App struct {
+					TestString int `config:"test_string"`
+				} `config:"app"`
+			}
+			err = config.Populate(&configStruct)
+			assert.Error(t, err)
 		})
 	})
 }
