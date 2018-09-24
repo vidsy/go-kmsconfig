@@ -3,6 +3,7 @@ package kmsconfig
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/pkg/errors"
 	"io/ioutil"
 	"os"
 	"reflect"
@@ -34,6 +35,71 @@ func NewConfig(path string, logHandler LogHandler) *Config {
 		logHandler: logHandler,
 		Path:       path,
 	}
+}
+
+// Populate takes a config struct and populates
+// it with the loaded data.
+func (c Config) Populate(config interface{}) error {
+	configValue := reflect.ValueOf(config).Elem()
+
+	if configValue.NumField() == 0 {
+		return errors.New("Expected struct to have >= 1 field, got 0")
+	}
+
+	for i := 0; i < configValue.NumField(); i++ {
+		nodeFieldValue := configValue.Field(i)
+		nodeFieldType := configValue.Type().Field(i)
+		if nodeFieldValue.NumField() == 0 {
+			return errors.Errorf(
+				"Struct '%s' should have 1 or more fields representing the second level of nesting in the config file, found no fields",
+				nodeFieldType.Name,
+			)
+		}
+
+		for j := 0; j < nodeFieldValue.NumField(); j++ {
+			sectionFieldType := nodeFieldValue.Type().Field(j)
+			sectionFieldValue := nodeFieldValue.Field(j)
+			nodeTag := nodeFieldType.Tag.Get("config")
+			sectionTag := sectionFieldType.Tag.Get("config")
+			nodeData, err := c.retrieve(nodeTag, sectionTag, false)
+			if err != nil {
+				return errors.Wrapf(
+					err,
+					"Unabled to find config value for %s.%s",
+					nodeTag,
+					sectionTag,
+				)
+			}
+
+			switch sectionFieldValue.Kind() {
+			case reflect.Int64:
+				var intType int64
+				convertedValue := reflect.ValueOf(nodeData).Convert(reflect.TypeOf(intType))
+				sectionFieldValue.Set(convertedValue)
+			case reflect.Slice:
+				slice, err := c.StringSlice(nodeTag, sectionTag)
+				if err != nil {
+					return err
+				}
+
+				sectionFieldValue.Set(reflect.ValueOf(slice))
+			default:
+				nodeDataValue := reflect.ValueOf(nodeData)
+				if sectionFieldValue.Kind() != nodeDataValue.Kind() {
+					return errors.Errorf(
+						"Expected data type in field '%s' to be the same as the type in the config node, got: %s != %s",
+						sectionFieldType.Name,
+						sectionFieldValue.Kind(),
+						nodeDataValue.Kind(),
+					)
+				}
+
+				sectionFieldValue.Set(reflect.ValueOf(nodeData))
+			}
+		}
+	}
+
+	return nil
 }
 
 // Boolean returns a boolean cast value from a config node and key.

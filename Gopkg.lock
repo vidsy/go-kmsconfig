@@ -62,6 +62,14 @@
   revision = "0b12d6b5"
 
 [[projects]]
+  digest = "1:40e195917a951a8bf867cd05de2a46aaf1806c50cf92eebf4c16f78cd196f747"
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  pruneopts = "T"
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
+
+[[projects]]
   digest = "1:22aa691fe0213cb5c07d103f9effebcb7ad04bee45a0ce5fe5369d0ca2ec3a1f"
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
@@ -83,6 +91,7 @@
   input-imports = [
     "github.com/aws/aws-sdk-go/aws/session",
     "github.com/aws/aws-sdk-go/service/kms",
+    "github.com/pkg/errors",
     "github.com/stretchr/testify/assert",
   ]
   solver-name = "gps-cdcl"

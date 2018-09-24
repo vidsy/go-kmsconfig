@@ -8,6 +8,19 @@ import (
 	"github.com/vidsy/go-kmsconfig/kmsconfig"
 )
 
+type (
+	configExample struct {
+		App app `config:"app"`
+	}
+
+	app struct {
+		TestBool        bool     `config:"test_bool"`
+		TestString      string   `config:"test_string"`
+		TestStringSlice []string `config:"test_string_slice"`
+		TestInt         int64    `config:"test_int"`
+	}
+)
+
 func TestConfig(t *testing.T) {
 	configLocation := "./fixtures/config"
 	logHandler := func(message string) {}
@@ -97,10 +110,50 @@ func TestConfig(t *testing.T) {
 
 		config := kmsconfig.NewConfig(configLocation, logHandler)
 		err = config.Load()
-		os.Unsetenv("VIDSY_VAR_app_string_value")
+		os.Unsetenv("VIDSY_VAR_app_test_string")
 
 		stringValue, err := config.String("app", "test_string")
 		assert.NoError(t, err)
 		assert.Equal(t, "baz", stringValue)
+	})
+
+	t.Run(".Populate()", func(t *testing.T) {
+		t.Run("PopulatesStructCorrectly", func(t *testing.T) {
+			config := kmsconfig.NewConfig(configLocation, logHandler)
+			err := config.Load()
+			assert.NoError(t, err)
+
+			var configStruct configExample
+			err = config.Populate(&configStruct)
+			assert.NoError(t, err)
+
+			assert.Equal(t, "foo", configStruct.App.TestString)
+			assert.Equal(t, int64(1), configStruct.App.TestInt)
+			assert.Len(t, configStruct.App.TestStringSlice, 2)
+			assert.True(t, configStruct.App.TestBool)
+		})
+
+		t.Run("ReturnsErrorWithEmptyStruct", func(t *testing.T) {
+			config := kmsconfig.NewConfig(configLocation, logHandler)
+			err := config.Load()
+			assert.NoError(t, err)
+
+			var configStruct struct{}
+			err = config.Populate(&configStruct)
+			assert.Error(t, err)
+		})
+
+		t.Run("ReturnsErrorWithNestedStructFiledWithNoValues", func(t *testing.T) {
+			config := kmsconfig.NewConfig(configLocation, logHandler)
+			err := config.Load()
+			assert.NoError(t, err)
+
+			var configStruct struct {
+				Foo struct{}
+			}
+			err = config.Populate(&configStruct)
+			assert.Error(t, err)
+
+		})
 	})
 }
