@@ -78,12 +78,7 @@ func (c *Config) Load() error {
 		return err
 	}
 
-	err = c.parse()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return c.parse()
 }
 
 // LoadAndPopulate Loads the config and populates the
