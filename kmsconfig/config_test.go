@@ -128,6 +128,17 @@ func TestConfig(t *testing.T) {
 			assert.True(t, configStruct.App.TestBool)
 		})
 
+		t.Run("ReturnsErrorIfPassedByValue", func(t *testing.T) {
+			var configStruct struct {
+				App struct {
+					TestBool bool `config:"test_bool"`
+				} `config:"app"`
+			}
+
+			err = config.Populate(configStruct)
+			assert.Error(t, err)
+		})
+
 		t.Run("ReturnsErrorWithEmptyStruct", func(t *testing.T) {
 			var configStruct struct{}
 			err = config.Populate(&configStruct)

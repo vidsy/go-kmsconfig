@@ -40,7 +40,12 @@ func NewConfig(path string, logHandler LogHandler) *Config {
 // Populate takes a config struct and populates
 // it with the loaded data.
 func (c Config) Populate(config interface{}) error {
-	configValue := reflect.ValueOf(config).Elem()
+	configPointer := reflect.ValueOf(config)
+	if configPointer.Kind() != reflect.Ptr {
+		return errors.New("Struct must be passed by reference")
+	}
+
+	configValue := configPointer.Elem()
 
 	if configValue.NumField() == 0 {
 		return errors.New("Expected struct to have >= 1 field, got 0")
