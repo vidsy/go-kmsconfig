@@ -3,6 +3,7 @@ package kmsconfig
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/pkg/errors"
 	"io/ioutil"
 	"os"
 	"reflect"
@@ -60,6 +61,104 @@ func (c Config) Integer(node string, key string) (int, error) {
 
 	value := configNode.(float64)
 	return int(value), nil
+}
+
+// Load reads the file from disk for
+// the given envrionment and attempts to
+// parse it into the config data structure.
+func (c *Config) Load() error {
+	path := c.generatePath()
+	config, err := ioutil.ReadFile(path)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal([]byte(config), &c.data)
+	if err != nil {
+		return err
+	}
+
+	return c.parse()
+}
+
+// LoadAndPopulate Loads the config and populates the
+// config struct argument.
+func (c *Config) LoadAndPopulate(config interface{}) error {
+	err := c.Load()
+	if err != nil {
+		return err
+	}
+
+	return c.Populate(config)
+}
+
+// Populate takes a config struct and populates
+// it with the loaded data.
+func (c Config) Populate(config interface{}) error {
+	configPointer := reflect.ValueOf(config)
+	if configPointer.Kind() != reflect.Ptr {
+		return errors.New("Struct must be passed by reference")
+	}
+
+	configValue := configPointer.Elem()
+	if configValue.NumField() == 0 {
+		return errors.New("Expected struct to have >= 1 field, got 0")
+	}
+
+	for i := 0; i < configValue.NumField(); i++ {
+		nodeFieldValue := configValue.Field(i)
+		nodeFieldType := configValue.Type().Field(i)
+		if nodeFieldValue.NumField() == 0 {
+			return errors.Errorf(
+				"Struct '%s' should have 1 or more fields representing the second level of nesting in the config file, found no fields",
+				nodeFieldType.Name,
+			)
+		}
+
+		for j := 0; j < nodeFieldValue.NumField(); j++ {
+			sectionFieldType := nodeFieldValue.Type().Field(j)
+			sectionFieldValue := nodeFieldValue.Field(j)
+			nodeTag := nodeFieldType.Tag.Get("config")
+			sectionTag := sectionFieldType.Tag.Get("config")
+			nodeData, err := c.retrieve(nodeTag, sectionTag, false)
+			if err != nil {
+				return errors.Wrapf(
+					err,
+					"Unabled to find config value for %s.%s",
+					nodeTag,
+					sectionTag,
+				)
+			}
+
+			switch sectionFieldValue.Kind() {
+			case reflect.Int64:
+				var intType int64
+				convertedValue := reflect.ValueOf(nodeData).Convert(reflect.TypeOf(intType))
+				sectionFieldValue.Set(convertedValue)
+			case reflect.Slice:
+				slice, err := c.StringSlice(nodeTag, sectionTag)
+				if err != nil {
+					return err
+				}
+
+				sectionFieldValue.Set(reflect.ValueOf(slice))
+			default:
+				nodeDataValue := reflect.ValueOf(nodeData)
+				if sectionFieldValue.Kind() != nodeDataValue.Kind() {
+					return errors.Errorf(
+						"Expected data type in field '%s' to be the same as the type in the config node, got: %s != %s",
+						sectionFieldType.Name,
+						sectionFieldValue.Kind(),
+						nodeDataValue.Kind(),
+					)
+				}
+
+				sectionFieldValue.Set(reflect.ValueOf(nodeData))
+			}
+		}
+	}
+
+	return nil
 }
 
 // String comment pending
@@ -125,27 +224,6 @@ func (c Config) RawValue(node string, key string) (interface{}, error) {
 	}
 
 	return configNode, nil
-}
-
-// Load comment pending
-func (c *Config) Load() error {
-	path := c.generatePath()
-	config, err := ioutil.ReadFile(path)
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal([]byte(config), &c.data)
-	if err != nil {
-		return err
-	}
-
-	err = c.parse()
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func (c Config) decryptSecureValue(key string, value string) (string, error) {
