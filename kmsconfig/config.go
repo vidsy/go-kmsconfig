@@ -37,6 +37,66 @@ func NewConfig(path string, logHandler LogHandler) *Config {
 	}
 }
 
+// Boolean returns a boolean cast value from a config node and key.
+func (c Config) Boolean(node string, key string) (bool, error) {
+	configNode, err := c.retrieve(node, key, false)
+	if err != nil {
+		return false, err
+	}
+
+	return configNode.(bool), nil
+}
+
+// Environment returns the value of the .Env field.
+func (c Config) Environment() string {
+	return c.Env
+}
+
+// Integer comment pending
+func (c Config) Integer(node string, key string) (int, error) {
+	configNode, err := c.retrieve(node, key, false)
+	if err != nil {
+		return 0, err
+	}
+
+	value := configNode.(float64)
+	return int(value), nil
+}
+
+// Load reads the file from disk for
+// the given envrionment and attempts to
+// parse it into the config data structure.
+func (c *Config) Load() error {
+	path := c.generatePath()
+	config, err := ioutil.ReadFile(path)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal([]byte(config), &c.data)
+	if err != nil {
+		return err
+	}
+
+	err = c.parse()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// LoadAndPopulate Loads the config and populates the
+// config struct argument.
+func (c *Config) LoadAndPopulate(config interface{}) error {
+	err := c.Load()
+	if err != nil {
+		return err
+	}
+
+	return c.Populate(config)
+}
+
 // Populate takes a config struct and populates
 // it with the loaded data.
 func (c Config) Populate(config interface{}) error {
@@ -106,32 +166,6 @@ func (c Config) Populate(config interface{}) error {
 	return nil
 }
 
-// Boolean returns a boolean cast value from a config node and key.
-func (c Config) Boolean(node string, key string) (bool, error) {
-	configNode, err := c.retrieve(node, key, false)
-	if err != nil {
-		return false, err
-	}
-
-	return configNode.(bool), nil
-}
-
-// Environment returns the value of the .Env field.
-func (c Config) Environment() string {
-	return c.Env
-}
-
-// Integer comment pending
-func (c Config) Integer(node string, key string) (int, error) {
-	configNode, err := c.retrieve(node, key, false)
-	if err != nil {
-		return 0, err
-	}
-
-	value := configNode.(float64)
-	return int(value), nil
-}
-
 // String comment pending
 func (c Config) String(node string, key string) (string, error) {
 	configNode, err := c.retrieve(node, key, false)
@@ -195,27 +229,6 @@ func (c Config) RawValue(node string, key string) (interface{}, error) {
 	}
 
 	return configNode, nil
-}
-
-// Load comment pending
-func (c *Config) Load() error {
-	path := c.generatePath()
-	config, err := ioutil.ReadFile(path)
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal([]byte(config), &c.data)
-	if err != nil {
-		return err
-	}
-
-	err = c.parse()
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func (c Config) decryptSecureValue(key string, value string) (string, error) {
