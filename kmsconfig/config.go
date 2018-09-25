@@ -46,7 +46,6 @@ func (c Config) Populate(config interface{}) error {
 	}
 
 	configValue := configPointer.Elem()
-
 	if configValue.NumField() == 0 {
 		return errors.New("Expected struct to have >= 1 field, got 0")
 	}
