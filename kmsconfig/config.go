@@ -10,7 +10,11 @@ import (
 	"strconv"
 )
 
-const overrideEnvStructure = "VIDSY_VAR_%s_%s"
+const (
+	overrideEnvStructure = "VIDSY_VAR_%s_%s"
+	configNodeName       = "config"
+	configOmitField      = "-"
+)
 
 type (
 	// Config stores all the config data, KMS wrapper and
@@ -118,8 +122,12 @@ func (c Config) Populate(config interface{}) error {
 		for j := 0; j < nodeFieldValue.NumField(); j++ {
 			sectionFieldType := nodeFieldValue.Type().Field(j)
 			sectionFieldValue := nodeFieldValue.Field(j)
-			nodeTag := nodeFieldType.Tag.Get("config")
-			sectionTag := sectionFieldType.Tag.Get("config")
+			nodeTag := nodeFieldType.Tag.Get(configNodeName)
+			sectionTag := sectionFieldType.Tag.Get(configNodeName)
+			if nodeTag == configOmitField || sectionTag == configOmitField {
+				continue
+			}
+
 			nodeData, err := c.retrieve(nodeTag, sectionTag, false)
 			if err != nil {
 				return errors.Wrapf(

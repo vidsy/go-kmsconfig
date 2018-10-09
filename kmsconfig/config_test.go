@@ -128,6 +128,27 @@ func TestConfig(t *testing.T) {
 			assert.True(t, configStruct.App.TestBool)
 		})
 
+		t.Run("PopulatesStructProperlyWithOmittedFields", func(t *testing.T) {
+			var configStruct struct {
+				App struct {
+					TestBool        bool     `config:"test_bool"`
+					TestString      string   `config:"test_string"`
+					TestStringSlice []string `config:"test_string_slice"`
+					TestOmit        int64    `config:"-"`
+				} `config:"app"`
+			}
+
+			configStruct.App.TestOmit = 10
+
+			err = config.Populate(&configStruct)
+			assert.NoError(t, err)
+
+			assert.Equal(t, "foo", configStruct.App.TestString)
+			assert.Len(t, configStruct.App.TestStringSlice, 2)
+			assert.True(t, configStruct.App.TestBool)
+			assert.Equal(t, int64(10), configStruct.App.TestOmit)
+		})
+
 		t.Run("ReturnsErrorIfPassedByValue", func(t *testing.T) {
 			var configStruct struct {
 				App struct {
