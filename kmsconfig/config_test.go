@@ -117,12 +117,12 @@ func TestConfig(t *testing.T) {
 					TestString          string        `config:"test_string"`
 					TestStringSlice     []string      `config:"test_string_slice"`
 					TestInt             int64         `config:"test_int"`
-					TestTimeMicrosecond time.Duration `config:"test_time_microseconds" config_duration_type:"microseconds"`
-					TestTimeMillisecond time.Duration `config:"test_time_milliseconds" config_duration_type:"milliseconds"`
-					TestTimeSecond      time.Duration `config:"test_time_seconds" config_duration_type:"seconds"`
-					TestTimeMinute      time.Duration `config:"test_time_minutes" config_duration_type:"minutes"`
-					TestTimeHour        time.Duration `config:"test_time_hours" config_duration_type:"hours"`
-					TestTimeDay         time.Duration `config:"test_time_days" config_duration_type:"days"`
+					TestTimeMicrosecond time.Duration `config:"test_time_microseconds"   config_duration_type:"microseconds"`
+					TestTimeMillisecond time.Duration `config:"test_time_milliseconds"   config_duration_type:"milliseconds"`
+					TestTimeSecond      time.Duration `config:"test_time_seconds"        config_duration_type:"seconds"`
+					TestTimeMinute      time.Duration `config:"test_time_minutes"        config_duration_type:"minutes"`
+					TestTimeHour        time.Duration `config:"test_time_hours"          config_duration_type:"hours"`
+					TestTimeDay         time.Duration `config:"test_time_days"           config_duration_type:"days"`
 				} `config:"app"`
 			}
 
