@@ -56,7 +56,7 @@ AWS_ENV=staging
 
 and `go-kmsconfig` will attempt to load `path_to_config/staging.json`.
 
-#### Example
+#### Simple Example
 
 ```go
 package main
@@ -81,6 +81,40 @@ func main() {
 	}
 
   log.Println("Config value for 'development.json' is: %s", configValue)
+}
+```
+
+### Advanced Example
+
+```go
+package main
+
+import (
+  "log"
+
+  "github.com/vidsy/go-kmsconfig/kmsconfig"
+)
+
+type (
+  Config struct {
+    App `config:"app"`
+  }
+
+  App struct {
+    Counter          int64         `config:"counter"`
+		Flag             bool          `config:"flag"`
+		SleepDuration    time.Duration `config:"sleep_duration_seconds"  config_duration_type:"seconds"`
+	}
+)
+
+func main() {
+  var config Config
+	err := config.Populate(&config)
+	if err != nil {
+		return nil, err
+  }
+
+  log.Println("SleepDuration value for 'development.json' is: %s", config.App.SleepDuration)
 }
 ```
 
