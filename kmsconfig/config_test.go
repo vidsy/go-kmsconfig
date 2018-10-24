@@ -117,7 +117,9 @@ func TestConfig(t *testing.T) {
 					TestString      string        `config:"test_string"`
 					TestStringSlice []string      `config:"test_string_slice"`
 					TestInt         int64         `config:"test_int"`
-					TestTime        time.Duration `config:"test_time" config_duration_type:"seconds"`
+					TestTimeSecond  time.Duration `config:"test_time" config_duration_type:"seconds"`
+					TestTimeMinute  time.Duration `config:"test_time_minutes" config_duration_type:"minutes"`
+					TestTimeHour    time.Duration `config:"test_time_hours" config_duration_type:"hours"`
 				} `config:"app"`
 			}
 
@@ -128,7 +130,9 @@ func TestConfig(t *testing.T) {
 			assert.Equal(t, int64(1), configStruct.App.TestInt)
 			assert.Len(t, configStruct.App.TestStringSlice, 2)
 			assert.True(t, configStruct.App.TestBool)
-			assert.Equal(t, time.Duration(2*time.Second), configStruct.App.TestTime)
+			assert.Equal(t, time.Duration(2*time.Second), configStruct.App.TestTimeSecond)
+			assert.Equal(t, time.Duration(5*time.Minute), configStruct.App.TestTimeMinute)
+			assert.Equal(t, time.Duration(10*time.Hour), configStruct.App.TestTimeHour)
 		})
 
 		t.Run("PopulatesStructProperlyWithOmittedFields", func(t *testing.T) {
