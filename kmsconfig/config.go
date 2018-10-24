@@ -13,9 +13,10 @@ import (
 )
 
 const (
-	overrideEnvStructure = "VIDSY_VAR_%s_%s"
-	configNodeName       = "config"
-	configOmitField      = "-"
+	overrideEnvStructure       = "VIDSY_VAR_%s_%s"
+	configNodeName             = "config"
+	configDurationTypeNodeName = "config_duration_type"
+	configOmitField            = "-"
 )
 
 type (
@@ -147,9 +148,29 @@ func (c Config) Populate(config interface{}) error {
 
 				switch sectionFieldValue.Type().Name() {
 				case "Duration":
-					duration := time.Duration(
-						time.Second * time.Duration(convertedValue.Int()),
-					)
+					var duration time.Duration
+					durationValue := convertedValue.Int()
+
+					configDurationTypeTag := sectionFieldType.Tag.Get(configDurationTypeNodeName)
+					switch configDurationTypeTag {
+					case "microseconds":
+						duration = time.Nanosecond * time.Duration(durationValue)
+					case "milliseconds":
+						duration = time.Microsecond * time.Duration(durationValue)
+					case "seconds":
+						duration = time.Second * time.Duration(durationValue)
+					case "minutes":
+						duration = time.Minute * time.Duration(durationValue)
+					case "hours":
+						duration = time.Hour * time.Duration(durationValue)
+					case "days":
+						duration = (time.Hour * 24) * time.Duration(durationValue)
+					default:
+						return errors.Errorf(
+							"Expected field of type time.Duration to have a struct tag '%s'",
+							configDurationTypeNodeName,
+						)
+					}
 
 					sectionFieldValue.Set(reflect.ValueOf(duration))
 				default:
