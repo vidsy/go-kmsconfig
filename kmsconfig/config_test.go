@@ -150,7 +150,6 @@ func TestConfig(t *testing.T) {
 
 			err = config.Populate(&configStruct)
 			assert.Error(t, err)
-
 		})
 
 		t.Run("MissingConfigDurationError", func(t *testing.T) {
@@ -162,7 +161,6 @@ func TestConfig(t *testing.T) {
 
 			err = config.Populate(&configStruct)
 			assert.Error(t, err)
-
 		})
 
 		t.Run("PopulatesStructProperlyWithOmittedFields", func(t *testing.T) {
