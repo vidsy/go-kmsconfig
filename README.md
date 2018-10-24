@@ -102,7 +102,7 @@ type (
 
   App struct {
     Counter          int64         `config:"counter"`
-	  Flag             bool          `config:"flag"`
+    Flag             bool          `config:"flag"`
     SleepDuration    time.Duration `config:"sleep_duration_seconds"  config_duration_type:"seconds"`
 	}
 )
