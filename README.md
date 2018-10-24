@@ -111,7 +111,7 @@ func main() {
   var config Config
 	err := config.Populate(&config)
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
   }
 
   log.Println("SleepDuration value for 'development.json' is: %s", config.App.SleepDuration)
