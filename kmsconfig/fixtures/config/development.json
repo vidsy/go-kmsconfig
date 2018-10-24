@@ -4,8 +4,28 @@
       "value": "foo",
       "secure": false
     },
-    "test_time": {
+    "test_time_microseconds": {
+      "value": 20,
+      "secure": false
+    },
+    "test_time_milliseconds": {
+      "value": 30,
+      "secure": false
+    },
+    "test_time_seconds": {
       "value": 2,
+      "secure": false
+    },
+    "test_time_minutes": {
+      "value": 5,
+      "secure": false
+    },
+    "test_time_hours": {
+      "value": 10,
+      "secure": false
+    },
+    "test_time_days": {
+      "value": 11,
       "secure": false
     },
     "test_string_slice": {
