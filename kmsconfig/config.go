@@ -148,8 +148,9 @@ func (c Config) Populate(config interface{}) error {
 				switch sectionFieldValue.Type().Name() {
 				case "Duration":
 					duration := time.Duration(
-						convertedValue.Int(),
+						time.Second * time.Duration(convertedValue.Int()),
 					)
+
 					sectionFieldValue.Set(reflect.ValueOf(duration))
 				default:
 					sectionFieldValue.Set(convertedValue)

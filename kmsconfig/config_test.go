@@ -128,7 +128,7 @@ func TestConfig(t *testing.T) {
 			assert.Equal(t, int64(1), configStruct.App.TestInt)
 			assert.Len(t, configStruct.App.TestStringSlice, 2)
 			assert.True(t, configStruct.App.TestBool)
-			assert.Equal(t, configStruct.App.TestTime, time.Duration(2))
+			assert.Equal(t, configStruct.App.TestTime, time.Duration(2000000000))
 		})
 
 		t.Run("PopulatesStructProperlyWithOmittedFields", func(t *testing.T) {
