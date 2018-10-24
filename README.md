@@ -109,8 +109,8 @@ type (
 
 func main() {
   var config Config
-	err := config.Populate(&config)
-	if err != nil {
+  err := config.Populate(&config)
+  if err != nil {
 		log.Fatal(err)
   }
 
