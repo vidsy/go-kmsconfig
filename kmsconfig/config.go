@@ -3,11 +3,13 @@ package kmsconfig
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/pkg/errors"
 	"io/ioutil"
 	"os"
 	"reflect"
 	"strconv"
+	"time"
+
+	"github.com/pkg/errors"
 )
 
 const (
@@ -142,7 +144,16 @@ func (c Config) Populate(config interface{}) error {
 			case reflect.Int64:
 				var intType int64
 				convertedValue := reflect.ValueOf(nodeData).Convert(reflect.TypeOf(intType))
-				sectionFieldValue.Set(convertedValue)
+
+				switch sectionFieldValue.Type().Name() {
+				case "Duration":
+					duration := time.Duration(
+						convertedValue.Int(),
+					)
+					sectionFieldValue.Set(reflect.ValueOf(duration))
+				default:
+					sectionFieldValue.Set(convertedValue)
+				}
 			case reflect.Slice:
 				slice, err := c.StringSlice(nodeTag, sectionTag)
 				if err != nil {

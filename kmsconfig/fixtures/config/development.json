@@ -4,6 +4,10 @@
       "value": "foo",
       "secure": false
     },
+    "test_time": {
+      "value": 2,
+      "secure": false
+    },
     "test_string_slice": {
       "value": [
         "foo",
