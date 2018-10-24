@@ -3,6 +3,7 @@ package kmsconfig_test
 import (
 	"os"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/vidsy/go-kmsconfig/kmsconfig"
@@ -112,10 +113,11 @@ func TestConfig(t *testing.T) {
 		t.Run("PopulatesStructCorrectly", func(t *testing.T) {
 			var configStruct struct {
 				App struct {
-					TestBool        bool     `config:"test_bool"`
-					TestString      string   `config:"test_string"`
-					TestStringSlice []string `config:"test_string_slice"`
-					TestInt         int64    `config:"test_int"`
+					TestBool        bool          `config:"test_bool"`
+					TestString      string        `config:"test_string"`
+					TestStringSlice []string      `config:"test_string_slice"`
+					TestInt         int64         `config:"test_int"`
+					TestTime        time.Duration `config:"test_time"`
 				} `config:"app"`
 			}
 
@@ -126,6 +128,7 @@ func TestConfig(t *testing.T) {
 			assert.Equal(t, int64(1), configStruct.App.TestInt)
 			assert.Len(t, configStruct.App.TestStringSlice, 2)
 			assert.True(t, configStruct.App.TestBool)
+			assert.Equal(t, configStruct.App.TestTime, time.Duration(2))
 		})
 
 		t.Run("PopulatesStructProperlyWithOmittedFields", func(t *testing.T) {
