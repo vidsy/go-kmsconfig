@@ -141,7 +141,7 @@ func TestConfig(t *testing.T) {
 			assert.Equal(t, time.Duration((time.Hour*24)*11), configStruct.App.TestTimeDay)
 		})
 
-		t.Run("ConfigDurationTypeError", func(t *testing.T) {
+		t.Run("ConfigErrorInvalidConfigDurationTypeTag", func(t *testing.T) {
 			var configStruct struct {
 				App struct {
 					TestTimeDay time.Duration `config:"test_time_days"  config_duration_type:"error"`
@@ -152,7 +152,7 @@ func TestConfig(t *testing.T) {
 			assert.Error(t, err)
 		})
 
-		t.Run("MissingConfigDurationError", func(t *testing.T) {
+		t.Run("MissingConfigDurationTypeTagError", func(t *testing.T) {
 			var configStruct struct {
 				App struct {
 					TestTimeDay time.Duration `config:"test_time_days"`
