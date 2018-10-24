@@ -117,12 +117,12 @@ func TestConfig(t *testing.T) {
 					TestString          string        `config:"test_string"`
 					TestStringSlice     []string      `config:"test_string_slice"`
 					TestInt             int64         `config:"test_int"`
-					TestTimeMicrosecond time.Duration `config:"test_time_microseconds"   config_duration_type:"microseconds"`
-					TestTimeMillisecond time.Duration `config:"test_time_milliseconds"   config_duration_type:"milliseconds"`
-					TestTimeSecond      time.Duration `config:"test_time_seconds"        config_duration_type:"seconds"`
-					TestTimeMinute      time.Duration `config:"test_time_minutes"        config_duration_type:"minutes"`
-					TestTimeHour        time.Duration `config:"test_time_hours"          config_duration_type:"hours"`
-					TestTimeDay         time.Duration `config:"test_time_days"           config_duration_type:"days"`
+					TestTimeMicrosecond time.Duration `config:"test_time_microseconds"      config_duration_type:"microseconds"`
+					TestTimeMillisecond time.Duration `config:"test_time_milliseconds"      config_duration_type:"milliseconds"`
+					TestTimeSecond      time.Duration `config:"test_time_seconds"           config_duration_type:"seconds"`
+					TestTimeMinute      time.Duration `config:"test_time_minutes"           config_duration_type:"minutes"`
+					TestTimeHour        time.Duration `config:"test_time_hours"             config_duration_type:"hours"`
+					TestTimeDay         time.Duration `config:"test_time_days"              config_duration_type:"days"`
 				} `config:"app"`
 			}
 
@@ -139,6 +139,30 @@ func TestConfig(t *testing.T) {
 			assert.Equal(t, time.Duration(5*time.Minute), configStruct.App.TestTimeMinute)
 			assert.Equal(t, time.Duration(10*time.Hour), configStruct.App.TestTimeHour)
 			assert.Equal(t, time.Duration((time.Hour*24)*11), configStruct.App.TestTimeDay)
+		})
+
+		t.Run("ConfigDurationTypeError", func(t *testing.T) {
+			var configStruct struct {
+				App struct {
+					TestTimeDay time.Duration `config:"test_time_days"  config_duration_type:"error"`
+				} `config:"app"`
+			}
+
+			err = config.Populate(&configStruct)
+			assert.Error(t, err)
+
+		})
+
+		t.Run("MissingConfigDurationError", func(t *testing.T) {
+			var configStruct struct {
+				App struct {
+					TestTimeDay time.Duration `config:"test_time_days"`
+				} `config:"app"`
+			}
+
+			err = config.Populate(&configStruct)
+			assert.Error(t, err)
+
 		})
 
 		t.Run("PopulatesStructProperlyWithOmittedFields", func(t *testing.T) {
