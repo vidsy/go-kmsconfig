@@ -154,9 +154,9 @@ func (c Config) Populate(config interface{}) error {
 					configDurationTypeTag := sectionFieldType.Tag.Get(configDurationTypeNodeName)
 					switch configDurationTypeTag {
 					case "microseconds":
-						duration = time.Nanosecond * time.Duration(durationValue)
-					case "milliseconds":
 						duration = time.Microsecond * time.Duration(durationValue)
+					case "milliseconds":
+						duration = time.Millisecond * time.Duration(durationValue)
 					case "seconds":
 						duration = time.Second * time.Duration(durationValue)
 					case "minutes":

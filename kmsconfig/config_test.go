@@ -113,13 +113,16 @@ func TestConfig(t *testing.T) {
 		t.Run("PopulatesStructCorrectly", func(t *testing.T) {
 			var configStruct struct {
 				App struct {
-					TestBool        bool          `config:"test_bool"`
-					TestString      string        `config:"test_string"`
-					TestStringSlice []string      `config:"test_string_slice"`
-					TestInt         int64         `config:"test_int"`
-					TestTimeSecond  time.Duration `config:"test_time" config_duration_type:"seconds"`
-					TestTimeMinute  time.Duration `config:"test_time_minutes" config_duration_type:"minutes"`
-					TestTimeHour    time.Duration `config:"test_time_hours" config_duration_type:"hours"`
+					TestBool            bool          `config:"test_bool"`
+					TestString          string        `config:"test_string"`
+					TestStringSlice     []string      `config:"test_string_slice"`
+					TestInt             int64         `config:"test_int"`
+					TestTimeMicrosecond time.Duration `config:"test_time_microseconds" config_duration_type:"microseconds"`
+					TestTimeMillisecond time.Duration `config:"test_time_milliseconds" config_duration_type:"milliseconds"`
+					TestTimeSecond      time.Duration `config:"test_time_seconds" config_duration_type:"seconds"`
+					TestTimeMinute      time.Duration `config:"test_time_minutes" config_duration_type:"minutes"`
+					TestTimeHour        time.Duration `config:"test_time_hours" config_duration_type:"hours"`
+					TestTimeDay         time.Duration `config:"test_time_days" config_duration_type:"days"`
 				} `config:"app"`
 			}
 
@@ -130,9 +133,12 @@ func TestConfig(t *testing.T) {
 			assert.Equal(t, int64(1), configStruct.App.TestInt)
 			assert.Len(t, configStruct.App.TestStringSlice, 2)
 			assert.True(t, configStruct.App.TestBool)
+			assert.Equal(t, time.Duration(20*time.Microsecond), configStruct.App.TestTimeMicrosecond)
+			assert.Equal(t, time.Duration(30*time.Millisecond), configStruct.App.TestTimeMillisecond)
 			assert.Equal(t, time.Duration(2*time.Second), configStruct.App.TestTimeSecond)
 			assert.Equal(t, time.Duration(5*time.Minute), configStruct.App.TestTimeMinute)
 			assert.Equal(t, time.Duration(10*time.Hour), configStruct.App.TestTimeHour)
+			assert.Equal(t, time.Duration((time.Hour*24)*11), configStruct.App.TestTimeDay)
 		})
 
 		t.Run("PopulatesStructProperlyWithOmittedFields", func(t *testing.T) {
