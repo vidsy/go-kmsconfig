@@ -114,15 +114,15 @@ func TestConfig(t *testing.T) {
 			var configStruct struct {
 				App struct {
 					TestBool             bool          `config:"test_bool"`
+					TestInt              int64         `config:"test_int"`
 					TestString           string        `config:"test_string"`
 					TestStringSlice      []string      `config:"test_string_slice"`
-					TestInt              int64         `config:"test_int"`
+					TestTimeDays         time.Duration `config:"test_time_days"         config_duration_type:"days"`
+					TestTimeHours        time.Duration `config:"test_time_hours"        config_duration_type:"hours"`
 					TestTimeMicroseconds time.Duration `config:"test_time_microseconds" config_duration_type:"microseconds"`
 					TestTimeMilliseconds time.Duration `config:"test_time_milliseconds" config_duration_type:"milliseconds"`
-					TestTimeSeconds      time.Duration `config:"test_time_seconds"      config_duration_type:"seconds"`
 					TestTimeMinutes      time.Duration `config:"test_time_minutes"      config_duration_type:"minutes"`
-					TestTimeHours        time.Duration `config:"test_time_hours"        config_duration_type:"hours"`
-					TestTimeDays         time.Duration `config:"test_time_days"         config_duration_type:"days"`
+					TestTimeSeconds      time.Duration `config:"test_time_seconds"      config_duration_type:"seconds"`
 				} `config:"app"`
 			}
 
