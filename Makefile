@@ -2,7 +2,6 @@ BRANCH = "master"
 PACKAGES ?= "$(shell glide nv)"
 PWD = $(shell pwd)
 REPONAME ?= "go-kmsconfig"
-S3_BUCKET ?= "go-kmsconfig.live.vidsy.co"
 VERSION = $(shell cat ./VERSION)
 
 build-image:
@@ -11,10 +10,6 @@ build-image:
 check-version:
 	@echo "Checking if value of VERSION file exists as Git tag..."
 	(! git rev-list ${VERSION})
-
-deploy:
-	@echo "Deploying version ${VERSION} to S3"
-	aws s3 cp go-kmsconfig s3://${S3_BUCKET}/${VERSION}/go-kmsconfig
 
 install:
 	@echo "=> Installing dependencies"
