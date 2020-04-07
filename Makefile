@@ -12,13 +12,14 @@ check-version:
 	(! git rev-list ${VERSION})
 
 install:
-	@echo "=> Installing dependencies"
-	@dep ensure
+	@echo "=> Install dependencies"
+	@GO111MODULE=on go mod download
 
 lint-ci:
 	@docker run -i --rm -v /var/run/docker.sock:/var/run/docker.sock -v ${PWD}:${PWD} -v ~/.circleci/:/root/.circleci --workdir ${PWD} circleci/picard:latest circleci config -c .circleci/config.yml validate
 
 push-tag:
+	@echo "=> New tag version: v${VERSION}"
 	git checkout ${BRANCH}
 	git pull origin ${BRANCH}
 	git tag v${VERSION}
