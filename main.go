@@ -7,8 +7,9 @@ import (
 	"os"
 
 	"flag"
-	"github.com/vidsy/go-kmsconfig/cli"
-	"github.com/vidsy/go-kmsconfig/kmsconfig"
+
+	"github.com/vidsy/go-kmsconfig/v5/cli"
+	"github.com/vidsy/go-kmsconfig/v5/kmsconfig"
 )
 
 var (

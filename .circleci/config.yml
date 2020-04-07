@@ -24,7 +24,7 @@ jobs:
       - setup_remote_docker
       - *install_docker_client
       - run:  make build-image
-    working_directory: /go/src/github.com/vidsy/go-kmsconfig
+    working_directory: /go-kmsconfig
 
   check_for_clubhouse_ticket_comment:
     docker:
@@ -41,7 +41,7 @@ jobs:
     steps:
       - checkout
       - run: make check-version
-    working_directory: /go/src/github.com/vidsy/go-kmsconfig
+    working_directory: /go-kmsconfig
 
   deploy:
     docker:
@@ -55,7 +55,7 @@ jobs:
       - deploy:
           name: deploy
           command: make push-to-registry
-    working_directory: /go/src/github.com/vidsy/go-kmsconfig
+    working_directory: /go-kmsconfig
 
   install_and_build:
     docker:
@@ -69,7 +69,7 @@ jobs:
           paths:
             - vendor
             - go-kmsconfig
-    working_directory: /go/src/github.com/vidsy/go-kmsconfig
+    working_directory: /go-kmsconfig
 
   release:
     docker:
@@ -79,7 +79,7 @@ jobs:
       - run: apk update && apk add ca-certificates make
       - *restore_cache
       - run: make release -e VIDSY_GOBOT_GITHUB_TOKEN=${VIDSY_GOBOT_GITHUB_TOKEN}
-    working_directory: /go/src/github.com/vidsy/go-kmsconfig
+    working_directory: /go-kmsconfig
 
   test:
     docker:
@@ -88,7 +88,7 @@ jobs:
       - checkout
       - *restore_cache
       - run: make test
-    working_directory: /go/src/github.com/vidsy/go-kmsconfig
+    working_directory: /go-kmsconfig
 
   vet:
     docker:
@@ -97,7 +97,7 @@ jobs:
       - checkout
       - *restore_cache
       - run: make vet
-    working_directory: /go/src/github.com/vidsy/go-kmsconfig
+    working_directory: /go-kmsconfig
 
 workflows:
   version: 2
@@ -108,7 +108,7 @@ workflows:
             - install_and_build
           filters:
             tags:
-              only: /[0-9]+\.[0-9]+\.[0-9]+/
+              only: /v[0-9]+\.[0-9]+\.[0-9]+/
             branches:
               ignore: master
 
@@ -134,14 +134,14 @@ workflows:
           filters:
             tags:
               only:
-                - /[0-9]+\.[0-9]+\.[0-9]+/
+                - /v[0-9]+\.[0-9]+\.[0-9]+/
             branches:
               ignore: /.*/
 
       - install_and_build:
           filters:
             tags:
-              only: /[0-9]+\.[0-9]+\.[0-9]+/
+              only: /v[0-9]+\.[0-9]+\.[0-9]+/
             branches:
               ignore: master
 
@@ -155,7 +155,7 @@ workflows:
           filters:
             tags:
               only:
-                - /[0-9]+\.[0-9]+\.[0-9]+/
+                - /v[0-9]+\.[0-9]+\.[0-9]+/
             branches:
               ignore: /.*/
 
@@ -173,6 +173,6 @@ workflows:
             - install_and_build
           filters:
             tags:
-              only: /[0-9]+\.[0-9]+\.[0-9]+/
+              only: /v[0-9]+\.[0-9]+\.[0-9]+/
             branches:
               ignore: master

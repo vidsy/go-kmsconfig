@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/vidsy/go-kmsconfig/kmsconfig"
+	"github.com/vidsy/go-kmsconfig/v5/kmsconfig"
 )
 
 type (
