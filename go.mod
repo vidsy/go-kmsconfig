@@ -1,4 +1,4 @@
-module github.com/vidsy/go-kmsconfig/kmsconfig
+module github.com/vidsy/go-kmsconfig/v5
 
 go 1.14
 
