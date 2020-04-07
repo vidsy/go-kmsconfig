@@ -115,6 +115,9 @@ func (c Config) Populate(config interface{}) error {
 	for i := 0; i < configValue.NumField(); i++ {
 		nodeFieldValue := configValue.Field(i)
 		nodeFieldType := configValue.Type().Field(i)
+		if nodeFieldValue.Kind() == reflect.Map {
+			continue
+		}
 		if nodeFieldValue.NumField() == 0 {
 			return errors.Errorf(
 				"Struct '%s' should have 1 or more fields representing the second level of nesting in the config file, found no fields",
