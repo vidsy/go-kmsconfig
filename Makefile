@@ -21,8 +21,8 @@ lint-ci:
 push-tag:
 	git checkout ${BRANCH}
 	git pull origin ${BRANCH}
-	git tag ${VERSION}
-	git push origin ${BRANCH} --tags
+	git tag v${VERSION}
+	git push origin v${VERSION}
 
 push-to-registry:
 	@docker login -e ${DOCKER_EMAIL} -u ${DOCKER_USER} -p ${DOCKER_PASS}
@@ -40,7 +40,7 @@ run:
 	@docker run --rm -v $(path):/config -e AWS_ENV=${AWS_ENV} vidsyhq/${REPONAME}:latest -path /config -node $(node)
 
 test:
-	@go test "${PACKAGES}" -cover
+	@GO111MODULE=on go test "${PACKAGES}" -cover
 
 vet:
-	@go vet "${PACKAGES}"
+	@GO111MODULE=on go vet "${PACKAGES}"
