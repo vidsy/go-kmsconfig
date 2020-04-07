@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/vidsy/go-kmsconfig/cli"
-	"github.com/vidsy/go-kmsconfig/kmsconfig"
+	"github.com/vidsy/go-kmsconfig/v5/cli"
+	"github.com/vidsy/go-kmsconfig/v5/kmsconfig"
 )
 
 func TestApp(t *testing.T) {

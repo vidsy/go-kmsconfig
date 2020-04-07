@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/vidsy/go-kmsconfig/kmsconfig"
+	"github.com/vidsy/go-kmsconfig/v5/kmsconfig"
 )
 
 func TestConfig(t *testing.T) {
