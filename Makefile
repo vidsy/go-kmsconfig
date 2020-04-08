@@ -33,7 +33,7 @@ push-to-registry:
 
 release:
 	rm -rf dist
-	@GITHUB_TOKEN=${VIDSY_GOBOT_GITHUB_TOKEN} VERSION=${VERSION} BUILD_TIME=%${BUILD_TIME} goreleaser
+	@GITHUB_TOKEN=${VIDSY_GOBOT_GITHUB_TOKEN} VERSION=v${VERSION} BUILD_TIME=%${BUILD_TIME} goreleaser
 
 run:
 	@if test -z $(path); then echo "Please specify a config file path"; exit 1; fi
