@@ -295,6 +295,8 @@ func (c Config) overrideEnv(sectionValue string, nodeValue string) (string, bool
 		return exists, true
 	}
 
+	c.logHandler(
+		fmt.Sprintf("Environment variable '%s' not found", environmentVariable))
 	return "", false
 }
 
