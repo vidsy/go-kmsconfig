@@ -314,37 +314,43 @@ func (c *Config) parse() error {
 			value := nodeValue["value"]
 			encryptedValue := ""
 
-			_, isString := nodeValue["value"].(string)
-			_, isBool := nodeValue["value"].(bool)
-
-			if isString {
-				overrideEnvValue, envVarExists := c.overrideEnv(sectionKey, nodeKey)
-
-				if envVarExists {
+			// I'll leave it to someone else to support encrypted values for fields that are not strings.
+			// Should be easy. Check if secure == true, check for the env var override,
+			// decrypt the string value, then unmarshal, then switch on the type to set the correctly typed value.
+			//
+			// Or throw out the whole library and write a better one.
+			overrideEnvValue, envVarExists := c.overrideEnv(sectionKey, nodeKey)
+			if envVarExists {
+				switch value.(type) {
+				case string:
 					value = overrideEnvValue
-					encryptedValue = overrideEnvValue
-				} else {
-					if secure {
-						decryptedValue, err := c.decryptSecureValue(nodeKey, value.(string))
-						if err != nil {
-							return err
-						}
-
-						encryptedValue = value.(string)
-						value = decryptedValue
+				case bool:
+					boolValue, err := strconv.ParseBool(overrideEnvValue)
+					if err != nil {
+						return fmt.Errorf("error parsing env var override boolean value: %s for node %s.%s", err.Error(), sectionKey, nodeKey)
 					}
+					value = boolValue
+				default:
+					var jsonValue interface{}
+					err := json.Unmarshal([]byte(overrideEnvValue), &jsonValue)
+					if err != nil {
+						return fmt.Errorf("error parsing env var override JSON value: %s for node %s.%s", err.Error(), sectionKey, nodeKey)
+					}
+					value = jsonValue
 				}
 			}
 
-			if isBool {
-				overrideEnvValue, envVarExists := c.overrideEnv(sectionKey, nodeKey)
-
-				if envVarExists {
-					boolValue, err := strconv.ParseBool(overrideEnvValue)
-					if err == nil {
-						value = boolValue
-					}
+			if secure {
+				encryptedStringValue, isString := value.(string)
+				if !isString {
+					return fmt.Errorf("secure value must be a string for node %s.%s", sectionKey, nodeKey)
 				}
+				decryptedValue, err := c.decryptSecureValue(nodeKey, encryptedStringValue)
+				if err != nil {
+					return fmt.Errorf("error decrypting secure value for node %s.%s: %s", sectionKey, nodeKey, err.Error())
+				}
+				encryptedValue = encryptedStringValue
+				value = decryptedValue
 			}
 
 			node := ConfigNode{
