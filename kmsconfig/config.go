@@ -430,7 +430,5 @@ func (c *Config) parseEnvsWithoutEncryption() error {
 		c.Sections[sectionName] = section
 	}
 
-	fmt.Fprintf(os.Stderr, "SECTIONS: %+v\n", c.Sections)
-
 	return nil
 }
