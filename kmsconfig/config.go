@@ -3,7 +3,6 @@ package kmsconfig
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"reflect"
 	"strconv"
@@ -74,8 +73,11 @@ func (c Config) Integer(node string, key string) (int, error) {
 // the given envrionment and attempts to
 // parse it into the config data structure.
 func (c *Config) Load() error {
-	path := c.generatePath()
-	config, err := ioutil.ReadFile(path)
+	config, err := os.ReadFile(c.generatePath())
+	if errors.Is(err, os.ErrNotExist) {
+		return c.parse()
+	}
+
 	if err != nil {
 		return err
 	}
