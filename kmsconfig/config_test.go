@@ -93,6 +93,10 @@ func TestConfig(t *testing.T) {
 		stringValue, err := config.String("foo", "bar")
 		assert.NoError(t, err)
 		assert.Equal(t, "bar", stringValue)
+
+		stringValue, err = config.String("foo", "bar_baz")
+		assert.NoError(t, err)
+		assert.Equal(t, "baz", stringValue)
 	})
 
 	t.Run("NodeErrors", func(t *testing.T) {
