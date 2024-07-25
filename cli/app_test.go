@@ -58,10 +58,10 @@ func TestApp(t *testing.T) {
 func generateKMSConfig(nodeName string, nodeValue interface{}) *kmsconfig.Config {
 	return &kmsconfig.Config{
 		Sections: map[string]kmsconfig.ConfigSection{
-			"foo": kmsconfig.ConfigSection{
+			"foo": {
 				Name: "foo",
 				Nodes: map[string]kmsconfig.ConfigNode{
-					"bar": kmsconfig.ConfigNode{
+					"bar": {
 						Name:  nodeName,
 						Value: nodeValue,
 					},

@@ -66,14 +66,14 @@ func TestConfig(t *testing.T) {
 		assert.Equal(t, "bar", stringValue)
 	})
 
-	t.Run("ErrorOnMissingEnvironment", func(t *testing.T) {
+	t.Run("NoErrorOnMissingConfigFile", func(t *testing.T) {
 		err := os.Setenv("AWS_ENV", "foo")
 		assert.NoError(t, err)
 
 		config := kmsconfig.NewConfig(configLocation, logHandler)
 		err = config.Load()
 		os.Unsetenv("AWS_ENV")
-		assert.Error(t, err)
+		assert.NoError(t, err)
 	})
 
 	t.Run("NodeErrors", func(t *testing.T) {
@@ -98,6 +98,7 @@ func TestConfig(t *testing.T) {
 
 		config := kmsconfig.NewConfig(configLocation, logHandler)
 		err = config.Load()
+		assert.NoError(t, err)
 		os.Unsetenv("VIDSY_VAR_app_test_string")
 
 		stringValue, err := config.String("app", "test_string")
