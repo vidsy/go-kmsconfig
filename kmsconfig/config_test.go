@@ -82,12 +82,6 @@ func TestConfig(t *testing.T) {
 
 		config := kmsconfig.NewConfig(configLocation, logHandler)
 		err = config.Load()
-
-		os.Unsetenv("AWS_ENV")
-		os.Unsetenv("VIDSY_VAR_FOO")
-		os.Unsetenv("VIDSY_VAR_FOO_BAR")
-		os.Unsetenv("VIDSY_VAR_FOO_BAR_BAZ")
-
 		assert.NoError(t, err)
 
 		stringValue, err := config.String("foo", "bar")
@@ -97,6 +91,11 @@ func TestConfig(t *testing.T) {
 		stringValue, err = config.String("foo", "bar_baz")
 		assert.NoError(t, err)
 		assert.Equal(t, "baz", stringValue)
+
+		os.Unsetenv("AWS_ENV")
+		os.Unsetenv("VIDSY_VAR_FOO")
+		os.Unsetenv("VIDSY_VAR_FOO_BAR")
+		os.Unsetenv("VIDSY_VAR_FOO_BAR_BAZ")
 	})
 
 	t.Run("NodeErrors", func(t *testing.T) {
