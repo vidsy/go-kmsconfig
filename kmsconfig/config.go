@@ -401,7 +401,7 @@ func (c *Config) parseEnvsWithoutEncryption() error {
 		}
 
 		partsB := strings.SplitN(partsA[1], "=", 2)
-		if len(partsA) != 2 {
+		if len(partsB) != 2 {
 			continue
 		}
 
