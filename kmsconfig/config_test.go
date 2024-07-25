@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+
 	"github.com/vidsy/go-kmsconfig/v5/kmsconfig"
 )
 
@@ -66,14 +67,32 @@ func TestConfig(t *testing.T) {
 		assert.Equal(t, "bar", stringValue)
 	})
 
-	t.Run("NoErrorOnMissingConfigFile", func(t *testing.T) {
+	t.Run("NoConfigFile", func(t *testing.T) {
 		err := os.Setenv("AWS_ENV", "foo")
+		assert.NoError(t, err)
+
+		err = os.Setenv("VIDSY_VAR_FOO", "foo")
+		assert.NoError(t, err)
+
+		err = os.Setenv("VIDSY_VAR_FOO_BAR", "bar")
+		assert.NoError(t, err)
+
+		err = os.Setenv("VIDSY_VAR_FOO_BAR_BAZ", "baz")
 		assert.NoError(t, err)
 
 		config := kmsconfig.NewConfig(configLocation, logHandler)
 		err = config.Load()
+
 		os.Unsetenv("AWS_ENV")
+		os.Unsetenv("VIDSY_VAR_FOO")
+		os.Unsetenv("VIDSY_VAR_FOO_BAR")
+		os.Unsetenv("VIDSY_VAR_FOO_BAR_BAZ")
+
 		assert.NoError(t, err)
+
+		stringValue, err := config.String("foo", "bar")
+		assert.NoError(t, err)
+		assert.Equal(t, "bar", stringValue)
 	})
 
 	t.Run("NodeErrors", func(t *testing.T) {

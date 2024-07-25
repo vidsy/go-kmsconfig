@@ -6,8 +6,10 @@ import (
 	"os"
 	"reflect"
 	"strconv"
+	"strings"
 	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
 )
 
@@ -18,20 +20,15 @@ const (
 	configOmitField            = "-"
 )
 
-type (
-	// Config stores all the config data, KMS wrapper and
-	// environment settings.
-	Config struct {
-		data       map[string]map[string]map[string]interface{}
-		logHandler LogHandler
-		Env        string
-		KMSWrapper KMSWrapper
-		Path       string
-		Sections   map[string]ConfigSection
-	}
-)
+type Config struct {
+	data       map[string]map[string]map[string]interface{}
+	logHandler LogHandler
+	Env        string
+	KMSWrapper KMSWrapper
+	Path       string
+	Sections   map[string]ConfigSection
+}
 
-// NewConfig comment pending
 func NewConfig(path string, logHandler LogHandler) *Config {
 	env := environment()
 
@@ -43,7 +40,6 @@ func NewConfig(path string, logHandler LogHandler) *Config {
 	}
 }
 
-// Boolean returns a boolean cast value from a config node and key.
 func (c Config) Boolean(node string, key string) (bool, error) {
 	configNode, err := c.retrieve(node, key, false)
 	if err != nil {
@@ -53,12 +49,10 @@ func (c Config) Boolean(node string, key string) (bool, error) {
 	return configNode.(bool), nil
 }
 
-// Environment returns the value of the .Env field.
 func (c Config) Environment() string {
 	return c.Env
 }
 
-// Integer comment pending
 func (c Config) Integer(node string, key string) (int, error) {
 	configNode, err := c.retrieve(node, key, false)
 	if err != nil {
@@ -69,13 +63,10 @@ func (c Config) Integer(node string, key string) (int, error) {
 	return int(value), nil
 }
 
-// Load reads the file from disk for
-// the given envrionment and attempts to
-// parse it into the config data structure.
 func (c *Config) Load() error {
 	config, err := os.ReadFile(c.generatePath())
 	if errors.Is(err, os.ErrNotExist) {
-		return c.parse()
+		return c.parseEnvsWithoutEncryption()
 	}
 
 	if err != nil {
@@ -90,8 +81,6 @@ func (c *Config) Load() error {
 	return c.parse()
 }
 
-// LoadAndPopulate Loads the config and populates the
-// config struct argument.
 func (c *Config) LoadAndPopulate(config interface{}) error {
 	err := c.Load()
 	if err != nil {
@@ -101,8 +90,6 @@ func (c *Config) LoadAndPopulate(config interface{}) error {
 	return c.Populate(config)
 }
 
-// Populate takes a config struct and populates
-// it with the loaded data.
 func (c Config) Populate(config interface{}) error {
 	configPointer := reflect.ValueOf(config)
 	if configPointer.Kind() != reflect.Ptr {
@@ -207,7 +194,6 @@ func (c Config) Populate(config interface{}) error {
 	return nil
 }
 
-// String comment pending
 func (c Config) String(node string, key string) (string, error) {
 	configNode, err := c.retrieve(node, key, false)
 	if err != nil {
@@ -217,7 +203,6 @@ func (c Config) String(node string, key string) (string, error) {
 	return configNode.(string), nil
 }
 
-// StringSlice returns a slice of strings.
 func (c Config) StringSlice(node string, key string) ([]string, error) {
 	configNode, err := c.retrieve(node, key, false)
 	if err != nil {
@@ -252,7 +237,6 @@ func (c Config) StringSlice(node string, key string) ([]string, error) {
 	return values, nil
 }
 
-// EncryptedString comment pending
 func (c Config) EncryptedString(node string, key string) (string, error) {
 	configNode, err := c.retrieve(node, key, true)
 	if err != nil {
@@ -262,7 +246,6 @@ func (c Config) EncryptedString(node string, key string) (string, error) {
 	return configNode.(string), nil
 }
 
-// RawValue the raw value in the config.
 func (c Config) RawValue(node string, key string) (interface{}, error) {
 	configNode, err := c.retrieve(node, key, false)
 	if err != nil {
@@ -316,11 +299,6 @@ func (c *Config) parse() error {
 			value := nodeValue["value"]
 			encryptedValue := ""
 
-			// I'll leave it to someone else to support encrypted values for fields that are not strings.
-			// Should be easy. Check if secure == true, check for the env var override,
-			// decrypt the string value, then unmarshal, then switch on the type to set the correctly typed value.
-			//
-			// Or throw out the whole library and write a better one.
 			overrideEnvValue, envVarExists := c.overrideEnv(sectionKey, nodeKey)
 			if envVarExists {
 				switch value.(type) {
@@ -402,4 +380,57 @@ func environment() string {
 
 func (c Config) generatePath() string {
 	return fmt.Sprintf("%s/%s.json", c.Path, c.Env)
+}
+
+func (c *Config) parseEnvsWithoutEncryption() error {
+	c.Sections = make(map[string]ConfigSection)
+
+	err := godotenv.Load(".env")
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
+		return err
+	}
+
+	for _, env := range os.Environ() {
+		if !strings.HasPrefix(env, "VIDSY_VAR_") {
+			continue
+		}
+
+		partsA := strings.SplitN(strings.ToLower(strings.TrimPrefix(env, "VIDSY_VAR_")), "_", 2)
+		if len(partsA) != 2 {
+			continue
+		}
+
+		partsB := strings.SplitN(partsA[1], "=", 2)
+		if len(partsA) != 2 {
+			continue
+		}
+
+		sectionName := partsA[0]
+		nodeName := partsB[0]
+		nodeValue := partsB[1]
+
+		if sectionName == "" || nodeName == "" || nodeValue == "" {
+			continue
+		}
+
+		section, ok := c.Sections[sectionName]
+		if !ok {
+			section = ConfigSection{
+				Name:  sectionName,
+				Nodes: make(map[string]ConfigNode),
+			}
+		}
+
+		section.Nodes[nodeName] = ConfigNode{
+			Name:   nodeName,
+			Value:  nodeValue,
+			Secure: false,
+		}
+
+		c.Sections[sectionName] = section
+	}
+
+	fmt.Fprintf(os.Stderr, "SECTIONS: %+v\n", c.Sections)
+
+	return nil
 }
