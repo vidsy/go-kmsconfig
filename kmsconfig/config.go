@@ -64,6 +64,7 @@ func (c Config) Integer(node string, key string) (int, error) {
 }
 
 func (c *Config) Load() error {
+
 	config, err := os.ReadFile(c.generatePath())
 	if errors.Is(err, os.ErrNotExist) {
 		return c.parseEnvsWithoutEncryption()
@@ -82,11 +83,14 @@ func (c *Config) Load() error {
 }
 
 func (c *Config) LoadAndPopulate(config interface{}) error {
+	if os.Getenv("K8S") == "true" {
+		return loadEnvConfig(config)
+	}
+
 	err := c.Load()
 	if err != nil {
 		return err
 	}
-
 	return c.Populate(config)
 }
 
