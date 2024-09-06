@@ -43,11 +43,11 @@ func buildConfigMap(config reflect.Value) (map[string]reflect.Value, error) {
 	for i := 0; i < config.NumField(); i++ {
 		namespaceValue := config.Field(i)
 
-		namespaceTag := configType.Field(i).Tag.Get("config")
+		namespaceTag := configType.Field(i).Tag.Get(configNodeName)
 		if namespaceTag == "" {
 			return nil, fmt.Errorf("config field %s has no config struct tag", configType.Field(i).Name)
 		}
-		if namespaceTag == "-" {
+		if namespaceTag == configOmitField {
 			continue
 		}
 
@@ -59,17 +59,17 @@ func buildConfigMap(config reflect.Value) (map[string]reflect.Value, error) {
 			configFieldValue := namespaceValue.Field(j)
 			configFieldType := namespaceValue.Type()
 
-			fieldTag := configFieldType.Field(j).Tag.Get("config")
+			fieldTag := configFieldType.Field(j).Tag.Get(configNodeName)
 			if fieldTag == "" {
 				return nil, fmt.Errorf("config field %s.%s has no config struct tag", configType.Field(i).Name, configFieldType.Field(j).Name)
 			}
-			if fieldTag == "-" {
+			if fieldTag == configOmitField {
 				continue
 			}
 
 			envVar := fmt.Sprintf("VIDSY_VAR_%s_%s", strings.ToUpper(namespaceTag), strings.ToUpper(fieldTag))
 			if _, ok := configMap[envVar]; ok {
-				return nil, fmt.Errorf("the field %s.%s resolves to the environment variable %s which is already set by another field",
+				return nil, fmt.Errorf("the field %s.%s resolves to the environment variable %s which is already used by another field",
 					configType.Field(i).Name, configFieldType.Field(j).Name, envVar)
 			}
 
@@ -125,7 +125,7 @@ func assignEnvVarValue(value reflect.Value, envValue string, envVarName string) 
 		}
 		overflows := value.OverflowUint(intValue)
 		if overflows {
-			return fmt.Errorf("environment variable %s overflows the int type", envVarName)
+			return fmt.Errorf("environment variable %s overflows the uint type", envVarName)
 		}
 
 		value.SetUint(intValue)

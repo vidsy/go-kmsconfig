@@ -83,7 +83,7 @@ func (c *Config) Load() error {
 }
 
 func (c *Config) LoadAndPopulate(config interface{}) error {
-	if os.Getenv("K8S") == "true" {
+	if os.Getenv("VIDSY_VAR_CONFIG_EXCLUSIVELY_FROM_ENVIRONMENT") == "true" {
 		return loadEnvConfig(config)
 	}
 
