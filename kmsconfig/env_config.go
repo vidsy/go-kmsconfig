@@ -8,8 +8,7 @@ import (
 	"strings"
 )
 
-func loadEnvConfig(config interface{}) error {
-
+func loadEnvConfig(config interface{}, kmsWrapper KMSWrapper) error {
 	ctype := reflect.ValueOf(config)
 	if ctype.Kind() != reflect.Ptr {
 		return fmt.Errorf("config must be a pointer")
@@ -23,11 +22,7 @@ func loadEnvConfig(config interface{}) error {
 		return err
 	}
 
-	if err := populateConfigFromEnv(configMap); err != nil {
-		return err
-	}
-
-	return nil
+	return populateConfigFromEnv(configMap, kmsWrapper)
 }
 
 // buildConfigMap iterates over the fields of the config struct and builds a map of the field names to their values.
@@ -80,22 +75,42 @@ func buildConfigMap(config reflect.Value) (map[string]reflect.Value, error) {
 	return configMap, nil
 }
 
-func populateConfigFromEnv(configMap map[string]reflect.Value) error {
+func populateConfigFromEnv(configMap map[string]reflect.Value, kmsWrapper KMSWrapper) error {
 	envVars := map[string]string{}
 	for _, envVar := range os.Environ() {
-		v := strings.Split(envVar, "=")
+		v := strings.SplitN(envVar, "=", 2)
 		envVars[v[0]] = v[1]
+	}
+
+	encryptedVariables := envVars["VIDSY_VAR_SECURED_ENVIRONMENT_VARIABLES"]
+	encryptedVariablesMap := map[string]struct{}{}
+	if len(encryptedVariables) > 0 {
+		// use the existing code to parse these because why not?
+		encryptedVariablesList := []string{}
+		if err := assignEnvVarValue(reflect.ValueOf(&encryptedVariablesList).Elem(), encryptedVariables, "VIDSY_VAR_SECURED_ENVIRONMENT_VARIABLES"); err != nil {
+			return err
+		}
+		for _, encryptedVariable := range encryptedVariablesList {
+			encryptedVariablesMap[encryptedVariable] = struct{}{}
+		}
 	}
 
 	// we expect to find all the environment variables from the config map
 	for envVarName, value := range configMap {
-		if envValue, ok := envVars[envVarName]; ok {
-			if err := assignEnvVarValue(value, envValue, envVarName); err != nil {
-				return err
-			}
-		} else {
+		envValue, ok := envVars[envVarName]
+		if !ok {
 			return fmt.Errorf("environment variable %s not found", envVarName)
 		}
+
+		if _, ok := encryptedVariablesMap[envVarName]; ok {
+			decryptedValue, err := kmsWrapper.Decrypt(envValue)
+			if err != nil {
+				return fmt.Errorf("error decrypting environment variable %s: %w", envVarName, err)
+			}
+			envValue = decryptedValue
+		}
+
+		return assignEnvVarValue(value, envValue, envVarName)
 	}
 
 	return nil

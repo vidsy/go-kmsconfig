@@ -84,7 +84,7 @@ func (c *Config) Load() error {
 
 func (c *Config) LoadAndPopulate(config interface{}) error {
 	if os.Getenv("VIDSY_VAR_CONFIG_EXCLUSIVELY_FROM_ENVIRONMENT") == "true" {
-		return loadEnvConfig(config)
+		return loadEnvConfig(config, c.KMSWrapper)
 	}
 
 	err := c.Load()
