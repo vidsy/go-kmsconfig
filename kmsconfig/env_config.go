@@ -110,7 +110,10 @@ func populateConfigFromEnv(configMap map[string]reflect.Value, kmsWrapper KMSWra
 			envValue = decryptedValue
 		}
 
-		return assignEnvVarValue(value, envValue, envVarName)
+		err := assignEnvVarValue(value, envValue, envVarName)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
